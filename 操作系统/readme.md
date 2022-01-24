@@ -34,10 +34,6 @@ https://blog.csdn.net/qq_45911678/category_11485698.html?spm=1001.2014.3001.5482
 
 
 
-linux：
-
-https://www.cnblogs.com/crazymakercircle/p/14366893.html
-
 
 
 操作系统：
@@ -82,6 +78,16 @@ https://blog.csdn.net/weixin_41888257/article/details/107397221
 
 https://blog.nowcoder.net/n/8eb0fca16c9c4829a4ac4c950aa1ffa5?from=nowcoder_improve
 
+https://leetcode-cn.com/circle/discuss/T8dPCY/
+
+https://blog.nowcoder.net/n/d0636b59436c48a8afc51bd6a4bc4b86
+
+https://blog.csdn.net/weixin_38118016/article/details/90761111
+
+
+
+
+
 
 
 Mysql
@@ -90,7 +96,17 @@ https://www.iamshuaidi.com/1402.html
 
 https://cloud.tencent.com/developer/article/1741504
 
+https://github.com/caokegege/Interview/blob/master/db/%E6%9C%80%E5%85%A8MySQL%E9%9D%A2%E8%AF%9560%E9%A2%98%E5%92%8C%E7%AD%94%E6%A1%88.md
 
+https://juejin.cn/post/6844903824935632909
+
+https://blog.csdn.net/ThinkWon/article/details/104778621
+
+https://www.cxyxiaowu.com/16302.html
+
+https://xie.infoq.cn/article/cfebbb58ad23b4b09bd5f8f66
+
+https://zhuanlan.zhihu.com/p/140876416
 
 
 
@@ -100,11 +116,51 @@ https://www.iamshuaidi.com/2309.html
 
 https://jiangren.work/2020/02/23/CPP%E9%9D%A2%E8%AF%95%E9%A2%98%E7%9B%AE%E6%B1%87%E6%80%BB/
 
+https://blog.csdn.net/chengxuyuanlaow/article/details/122008406
+
+https://www.w3cschool.cn/cpp/cpp-a9no2ppi.html
+
+https://blog.nowcoder.net/n/8fb82022d81c4bda95969c67a31a0262?from=nowcoder_improve
+
+https://developer.aliyun.com/article/709155
+
+https://juejin.cn/post/6844903878886948878
+
+https://www.cnblogs.com/yjd_hycf_space/p/7495640.html
+
+https://leetcode-cn.com/leetbook/detail/cpp-interview-highlights/
+
+https://ysmox.com/2020/08/13/C++%E6%A0%A1%E6%8B%9B%E9%9D%A2%E8%AF%95%E9%A2%98%E9%9B%86%E5%90%88/
+
+https://www.jianshu.com/p/189956c94cef
+
+https://www.bilibili.com/read/cv11868065
+
+https://new.qq.com/omn/20191017/20191017A0GK7A00.html?pc
+
+https://m.html.cn/qa/other/11198862480600.html
+
+https://www.yanbinghu.com/2019/09/19/23258.html
+
 
 
 数据结构：
 
 https://blog.51cto.com/u_12877374/2853832
+
+https://zhuanlan.zhihu.com/p/74935718
+
+https://segmentfault.com/a/1190000040007585
+
+https://juejin.cn/post/6844904127059738637
+
+https://blog.csdn.net/ThinkWon/article/details/104588679
+
+https://www.xmmup.com/zhuanlinuxmianshitizhengli.html
+
+https://github.com/Qiu-Ye/InterviewFAQ-Linux
+
+
 
 
 
@@ -125,6 +181,10 @@ https://blog.csdn.net/ThinkWon/article/details/104588679
 https://www.xmmup.com/zhuanlinuxmianshitizhengli.html
 
 https://github.com/Qiu-Ye/InterviewFAQ-Linux
+
+https://www.cnblogs.com/crazymakercircle/p/14366893.html
+
+
 
 
 
@@ -150,7 +210,7 @@ https://blog.51cto.com/u_12444109/3168050
 
 https://hit-alibaba.github.io/interview/basic/network/HTTP.html
 
-
+https://www.bookstack.cn/read/cpp-interview/spilt.17.README.md
 
 
 
