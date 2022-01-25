@@ -74,3 +74,21 @@ HTTP/2.0
 - 报头压缩，HTTP 协议不带有状态，每次请求都必须附上所有信息。Http/2.0 引入了头信息压缩机制，使用 gzip 或 compress 压缩后再发送
 - 服务端推送，允许服务器未经请求，主动向客户端发送资源
 
+# HTTP 长连接
+
+**思路:** 这道题实际上是考察TCP长连接的知识点，HTTP的长连接实质是指TCP的长连接。至于什么时候超时，我们记住这几个参数如**tcp_keepalive_time**、**tcp_keepalive_probes**就好啦
+
+HTTP 分为长连接和短连接，本质上说的是 TCP 的长短连接。TCP 连接是一个双向的通道，它是可以保持一段时间不关闭的，因此TCP连接才具有真正的长连接和短连接这一说法哈。
+
+TCP 长连接可以复用一个 TCP 连接，来发起多次的 HTTP 请求，这样就可以减少资源消耗，比如一次请求 HTML，如果是短连接的话，可能还需要请求后续的 JS/CSS。
+
+通过在头部（请求和响应头）设置 `Connection` 字段指定为`keep-alive`，HTTP/1.0 协议支持，但是是默认关闭的，从HTTP/1.1以后，连接默认都是长连接。
+
+
+
+**在什么时候会超时呢？**
+
+> ★
+>
+> - HTTP一般会有httpd守护进程，里面可以设置**keep-alive timeout**，当tcp连接闲置超过这个时间就会关闭，也可以在HTTP的header里面设置超时时间
+> - TCP 的**keep-alive**包含三个参数，支持在系统内核的net.ipv4里面设置；当 TCP 连接之后，闲置了**tcp_keepalive_time**，则会发生侦测包，如果没有收到对方的ACK，那么会每隔 tcp_keepalive_intvl再发一次，直到发送了**tcp_keepalive_probes**，就会丢弃该连接。
