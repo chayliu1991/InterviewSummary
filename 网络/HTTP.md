@@ -1,3 +1,11 @@
+# URI 和 URL 的区别
+
+- URI，全称是 Uniform Resource Identifier，统一资源标志符，主要作用是唯一标识一个资源
+
+- URL，全称是 Uniform Resource Location，统一资源定位符，主要作用是提供资源的路径。
+
+打个经典比喻吧，URI 像是身份证，可以唯一标识一个人，而 URL 更像一个住址，可以通过 URL 找到这个人
+
 # HTTP 常用状态码
 
 ![](./img/http_code.png)
@@ -45,15 +53,6 @@ POST 和 GET 有哪些区别：
 - DELETE 可以多次删除同一个资源，效果都是“资源不存在”，所以也是幂等的
 - POST 是“新增或提交数据”，多次提交数据会创建多个资源，所以不是幂等的
 - PUT 是“替换或更新数据”，多次更新一个资源，资源还是会第一次更新的状态，所以是幂等的
-
-# 从浏览器地址栏输入url 到显示主页的过程
-
-- DNS 解析，查找域名对应的 IP 地址
-- 与服务器通过三次握手，建立 TCP 连接
-- 向服务器发送 HTT P请求
-- 服务器处理请求，返回网页内容
-- 浏览器解析并渲染页面
-- TCP四次挥手，连接结束
 
 # HTTP/1.0，1.1，2.0 的区别
 
@@ -143,3 +142,26 @@ TLS，即 Transport Layer Security (安全传输层协议)，它是 SSL3.0 的�
 - WebSocket是一个持久化的协议，它是伴随H5而出的协议，用来解决 http不支持持久化连接的问题
 - Socket一个是网编编程的标准接口，而 WebSocket 则是应用层通信协议。
 
+# HTTP 请求的过程
+
+![](./img/http_process.png)
+
+- 客户端进行 DNS 域名解析，得到对应的 IP 地址
+- 根据这个 IP，找到对应的服务器建立连接（三次握手）
+- 建立 TCP 连接后发起 HTTP 请求（一个完整的http请求报文）
+- 服务器响应 HTTP 请求，客户端得到 html 代码
+- 客户端解析 html 代码，用 html 代码中的资源(如js,css,图片等等)渲染页面
+- 服务器关闭 TCP 连接（四次挥手）
+
+# Session 和 Cookie 的区别
+
+Cookie 是保存在客户端的一小块文本串的数据。客户端向服务器发起请求时，服务端会向客户端发送一个 Cookie，客户端就把 Cookie 保存起来。在客户端下次向同一服务器再发起请求时，Cookie 被携带发送到服务器。服务器就是根据这个 Cookie 来确认身份的。
+
+Session 指的就是服务器和客户端一次会话的过程。Session 利用 Cookie 进行信息处理的，当用户首先进行了请求后，服务端就在用户浏览器上创建了一个 Cookie，当这个Session结束时，其实就是意味着这个 Cookie 就过期了。Session 对象存储着特定用户会话所需的属性及配置信息。
+
+![](./img/session_cookie.png)
+
+![](./img/session_cookie2.png)
+
+- 用户第一次请求服务器时，服务器根据用户提交的信息，创建对应的 Session，请求返回时将此Session的唯一标识信息 SessionID 返回给浏览器，浏览器接收到服务器返回的SessionID信息后，会将此信息存入 Cookie 中，同时 Cookie 记录此 SessionID 是属于哪个域名
+- 当用户第二次访问服务器时，请求会自动判断此域名下是否存在 Cookie 信息，如果存在，则自动将 Cookie 信息也发送给服务端，服务端会从 Cookie 中获取 SessionID，再根据 SessionID查找对应的 Session 信息，如果没有找到，说明用户没有登录或者登录失效，如果找到 Session 证明用户已经登录可执行后面操作
