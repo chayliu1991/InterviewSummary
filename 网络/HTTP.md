@@ -153,15 +153,46 @@ TLS，即 Transport Layer Security (安全传输层协议)，它是 SSL3.0 的�
 - 客户端解析 html 代码，用 html 代码中的资源(如js,css,图片等等)渲染页面
 - 服务器关闭 TCP 连接（四次挥手）
 
-# Session 和 Cookie 的区别
-
-Cookie 是保存在客户端的一小块文本串的数据。客户端向服务器发起请求时，服务端会向客户端发送一个 Cookie，客户端就把 Cookie 保存起来。在客户端下次向同一服务器再发起请求时，Cookie 被携带发送到服务器。服务器就是根据这个 Cookie 来确认身份的。
-
-Session 指的就是服务器和客户端一次会话的过程。Session 利用 Cookie 进行信息处理的，当用户首先进行了请求后，服务端就在用户浏览器上创建了一个 Cookie，当这个Session结束时，其实就是意味着这个 Cookie 就过期了。Session 对象存储着特定用户会话所需的属性及配置信息。
-
-![](./img/session_cookie.png)
+# Session、Cookie、Token
 
 ![](./img/session_cookie2.png)
 
-- 用户第一次请求服务器时，服务器根据用户提交的信息，创建对应的 Session，请求返回时将此Session的唯一标识信息 SessionID 返回给浏览器，浏览器接收到服务器返回的SessionID信息后，会将此信息存入 Cookie 中，同时 Cookie 记录此 SessionID 是属于哪个域名
-- 当用户第二次访问服务器时，请求会自动判断此域名下是否存在 Cookie 信息，如果存在，则自动将 Cookie 信息也发送给服务端，服务端会从 Cookie 中获取 SessionID，再根据 SessionID查找对应的 Session 信息，如果没有找到，说明用户没有登录或者登录失效，如果找到 Session 证明用户已经登录可执行后面操作
+**Cookie：**
+
+- 是由服务器发给客户端的特殊信息，以文本的形式存放在客户端
+- 客户端再次请求的时候，会把 Cookie 回发给服务器
+- 服务器接收到后，会解析 Cookie 生成与客户端相对应的内容
+
+Cookie 的设置与发送过程分以下四步：
+
+- 客户端发送一个 http 请求到服务端
+- 服务端发送一个 http 响应到客户端，其中包括了 Set-Cookie 的头部
+- 客户端再发送一个 http 请求到服务器端，包括了 Cookie头部
+- 服务器端发送一个 http 响应到客户端
+
+**Session：**
+
+- 服务器端的机制，在服务器上保存的信息
+- 解析客户端请求并操作 Session id ，按需保存状态信息
+
+Session 的实现方式：
+
+- 使用cookie实现
+  - 服务器给每一个 session 分配唯一的 SessionID，并通过 cookie 发送给客户端，当客户端发起新的请求时候，将在 cookie 头中携带 SessionID，这样服务器能够找到客户端对应的 session
+- 使用URL地址回写
+  - 当服务器发送给浏览器页面的所有链接中，都携带 SessionID 的参数，这样客户端点击任何一个链接，都会把 SessionID 带回服务器，如果直接在浏览器输入服务端资源的 URL 来请求该资源，那么 session 是请求不到的
+
+Cookie 和 Session 的区别：
+
+![](./img/session_cookie.png)
+
+**Token：**
+
+客户端在浏览器第一次访问服务端时，服务端生成的一串字符串作为 Token 发给客户端浏览器，下次浏览器在访问服务端时携带 Token  即可无需验证用户名和密码，省下来大量的资源开销。
+
+Token 的认证流程：
+
+- 用户登录，成功后服务器返回 Token 给客户端
+- 客户端收到数据后保存在客户端
+- 客户端再次访问服务器，将 Token  放入headers 中
+- 服务器端采用 filter 过滤器校验。校验成功则返回请求数据，校验失败则返回错误码
