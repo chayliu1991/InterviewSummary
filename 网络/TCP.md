@@ -386,6 +386,14 @@ TCP 断开连接是通过四次挥⼿⽅式。双⽅都可以主动断开连接�
 - 关闭连接时，客户端向服务端发送 FIN 时，仅仅表示客户端不再发送数据了但是还能接收数据
 - 服务器收到客户端的 FIN 报⽂时，先回⼀个 ACK 应答报⽂，⽽服务端可能还有数据需要处理和发送，等服务端不再发送数据时，才发送 FIN 报⽂给客户端来表示同意现在关闭连接，所以服务端的 ACK 和 FIN ⼀般都会分开发送，从⽽⽐三次握⼿导致多了⼀次
 
+双⽅同时关闭连接  ：
+
+由于 TCP 是双全⼯的协议，所以是会出现两⽅同时关闭连接的现象，也就是同时发送了 FIN 报⽂。此时，上⾯介绍的优化策略仍然适⽤。两⽅发送 FIN 报⽂时，都认为⾃⼰是主动⽅，所以都进⼊了 FIN_WAIT1 状态， FIN 报⽂的重发次数仍由 tcp_orphan_retries 参数控制。  
+
+接下来， 双⽅在等待 ACK 报⽂的过程中，都等来了 FIN 报⽂。这是⼀种新情况，所以连接会进⼊⼀种叫做 CLOSING 的新状态，它替代了 FIN_WAIT2 状态。接着，双⽅内核回复 ACK 确认对⽅发送通道的关闭后，进⼊TIME_WAIT 状态，等待 2MSL 的时间后，连接⾃动关闭。  
+
+![](./img\close_sametime.png)
+
 ## Time-Wait
 
 MSL 是 Maximum Segment Lifetime， 报⽂最⼤⽣存时间，它是任何报⽂在⽹络上存在的最⻓时间，超过这个时间报⽂将被丢弃。
@@ -495,7 +503,7 @@ setsockopt(s, SOL_SOCKET, SO_LINGER, &so_linger,sizeof(so_linger));
 
 TIME_WAIT和CLOSE_WAIT的区别在哪?
 
-- CLOSE_WAIT 是被动关闭形成的，当客户端发送 FIN 报文，服务端返回 ACK 报文后进入 CLOSE_WAIT
+- CLOSE_WAIT 是被动关闭形成的，当客户端发送 FIN 报文，服务端返回 ACK 报文后进入 CLOSE_WAIT，Linux 并没有限制 CLOSE_WAIT 状态的持续时间
 - TIME_WAIT 是主动关闭形成的，当第四次挥手完成后，客户端进入 TIME_WAIT 状态
 
 ## 优化
@@ -536,6 +544,46 @@ FIN_WAIT2 状态优化：
 ```
 
 它意味着对于孤⼉连接（调⽤ close 关闭的连接），如果在 60 秒后还没有收到 FIN 报⽂，连接就会直接关闭。这个 60 秒不是随便决定的，它与 TIME_WAIT 状态持续的时间是相同的。  
+
+TIME_WAIT 状态优化：
+
+Linux 提供了 tcp_max_tw_buckets 参数，当 TIME_WAIT 的连接数量超过该参数时，新关闭的连接就不再经历 TIME_WAIT ⽽直接关闭：
+
+```
+/proc/sys/net/ipv4/tcp_max_tw_buckets
+```
+
+tcp_max_tw_buckets 也不是越⼤越好，毕竟内存和端⼝都是有限的。    
+
+有⼀种⽅式可以在建⽴新连接时，复⽤处于 TIME_WAIT 状态的连接，那就是打开 tcp_tw_reuse 参数。但是需要注意，该参数是只⽤于客户端（建⽴连接的发起⽅），因为是在调⽤ connect() 时起作⽤的，⽽对于服务端（被动连接⽅）是没有⽤的：
+
+```
+/proc/sys/net/ipv4/tcp_tw_reuse
+```
+
+tcp_tw_reuse 从协议⻆度理解是安全可控的，可以复⽤处于 TIME_WAIT 的端⼝为新的连接所⽤。什么是协议⻆度理解的安全可控呢？主要有两点：    
+
+- 只适⽤于连接发起⽅，也就是 C/S 模型中的客户端
+- 对应的 TIME_WAIT 状态的连接创建时间超过 1 秒才可以被复⽤  
+
+使⽤这个选项，还有⼀个前提，需要打开对 TCP 时间戳的⽀持（对⽅也要打开 ）：  
+
+```
+/proc/sys/net/ipv4/tcp_timestamps
+```
+
+由于引⼊了时间戳，它能带来了些好处：
+
+- 前⾯提到的 2MSL 问题就不复存在了，因为重复的数据包会因为时间戳过期被⾃然丢弃
+- 同时，它还可以防⽌序列号绕回，也是因为重复的数据包会由于时间戳过期被⾃然丢弃
+
+另外，我们可以在程序中设置 socket 选项，来设置调⽤ close 关闭连接⾏为：
+
+![](./img/socket_option.png)
+
+如果 l_onoff 为⾮ 0， 且 l_linger 值为 0， 那么调⽤ close 后，会⽴该发送⼀个 RST 标志给对端，该 TCP 连接将跳过四次挥⼿，也就跳过了 TIME_WAIT 状态，直接关闭。但这为跨越 TIME_WAIT 状态提供了⼀个可能，不过是⼀个⾮常危险的⾏为，不值得提倡。   
+
+
 
 # TCP 保活机制  
 
