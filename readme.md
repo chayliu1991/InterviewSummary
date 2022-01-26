@@ -1,19 +1,5 @@
 网络：
 
-https://segmentfault.com/a/1190000038526729
-
-https://www.cnblogs.com/crazymakercircle/p/14499211.html
-
-https://xie.infoq.cn/article/860862988d839a5ab105c73b7
-
-https://www.justdojava.com/2019/11/03/Network_interview_question/
-
-https://cloud.tencent.com/developer/article/1871138
-
-https://www.nowcoder.com/ta/review-network
-
-https://www.mianshigee.com/tag/155fde/p1
-
 https://blog.nowcoder.net/n/d74de7cdf61b4407a650439f1690a839
 
 https://python.iitter.com/other/167767.html
