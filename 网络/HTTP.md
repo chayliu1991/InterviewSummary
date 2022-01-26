@@ -156,39 +156,25 @@ TLS，即 Transport Layer Security (安全传输层协议)，它是 SSL3.0 的�
 # Session、Cookie、Token
 
 ![](./img/session_cookie2.png)
+- 首先，客户端会发送一个http请求到服务器端
+- 服务器端接受客户端请求后，建立一个 session，并发送一个 http 响应到客户端，这个响应头，其中就包含 Set-Cookie 头部。该头部包含了 SessionId
+- 在客户端发起的第二次请求，假如服务器给了 set-Cookie，浏览器会自动在请求头中添加 Cookie
 
-**Cookie：**
+Cookie：是由服务器发给客户端的特殊信息，以文本的形式存放在客户端，客户端再次请求的时候，会把 Cookie 回发给服务器，服务器接收到后，会解析 Cookie 生成与客户端相对应的内容。
 
-- 是由服务器发给客户端的特殊信息，以文本的形式存放在客户端
-- 客户端再次请求的时候，会把 Cookie 回发给服务器
-- 服务器接收到后，会解析 Cookie 生成与客户端相对应的内容
-
-Cookie 的设置与发送过程分以下四步：
-
-- 客户端发送一个 http 请求到服务端
-- 服务端发送一个 http 响应到客户端，其中包括了 Set-Cookie 的头部
-- 客户端再发送一个 http 请求到服务器端，包括了 Cookie头部
-- 服务器端发送一个 http 响应到客户端
-
-**Session：**
-
-- 服务器端的机制，在服务器上保存的信息
-- 解析客户端请求并操作 Session id ，按需保存状态信息
-
-Session 的实现方式：
-
-- 使用cookie实现
-  - 服务器给每一个 session 分配唯一的 SessionID，并通过 cookie 发送给客户端，当客户端发起新的请求时候，将在 cookie 头中携带 SessionID，这样服务器能够找到客户端对应的 session
-- 使用URL地址回写
-  - 当服务器发送给浏览器页面的所有链接中，都携带 SessionID 的参数，这样客户端点击任何一个链接，都会把 SessionID 带回服务器，如果直接在浏览器输入服务端资源的 URL 来请求该资源，那么 session 是请求不到的
+Session：是服务器端的机制，在服务器上保存的信息，解析客户端请求并操作 SessionId，按需保存状态信息。
 
 Cookie 和 Session 的区别：
 
-![](./img/session_cookie.png)
+![](./img/Session_Cookie.png)
 
-**Token：**
+现在大多都是Session + Cookie的使用方式：使用 Session 只需要在客户端保存一个 SessionId，实际上大量数据都是保存在服务端。如果全部用 Cookie，数据量大的时候客户端是没有那么多空间的。如果只用 Cookie 不用 Session，那么账户信息全部保存在客户端，一旦被劫持，全部信息都会泄露。并且客户端数据量变大，网络传输的数据量也会变大。
 
-客户端在浏览器第一次访问服务端时，服务端生成的一串字符串作为 Token 发给客户端浏览器，下次浏览器在访问服务端时携带 Token  即可无需验证用户名和密码，省下来大量的资源开销。
+Cookie 只是实现 Session 的其中一种方案。虽然是最常用的，但并不是唯一的方法，禁用 Cookie 后还有其他方法存储，比如放在 url 中。
+
+Token：
+
+客户端是一种服务端无状态的认证方式, 非常适合于 REST API 的场景。Token 在客户端一般存放于 localStorage，Cookie，或 SessionStorage 中。在服务器一般存于数据库中。
 
 Token 的认证流程：
 
