@@ -130,7 +130,7 @@ Length 指明Option的总长度（包括Kind和Length）。
 
 常用的 Option：
 
-![](./img/tcp_options.png)
+![](./img/tcp_option.png)
 
 # TCP 建立连接
 
@@ -192,21 +192,108 @@ TCP 协议的通信双⽅， 都必须维护⼀个序列号， 序列号是可�
 
 ![](./img/tcp_dup_connection.png)
 
-## 异常情况
+## 优化
 
-SYN+ACK 丢包：
+调整 SYN 报文的重传次数：
 
 客户端在等待服务端回复的 ACK 报⽂，正常情况下，服务器会在⼏毫秒内返回 SYN+ACK ，但如果客户端⻓时间没有收到 SYN+ACK 报⽂，则会重发 SYN 包， 重发的次数由 tcp_syn_retries 参数控制：
 
 ```
-cat /proc/sys/net/ipv4/tcp_synack_retries
+/proc/sys/net/ipv4/tcp_syn_retries
 ```
 
 通常，第⼀次超时重传是在 1 秒后，第⼆次超时重传是在 2 秒，第三次超时重传是在 4 秒后，第四次超时重传是在 8 秒后，第五次是在超时重传 16 秒后。每次超时的时间是上⼀次的 2 倍。当第五次超时重传后，会继续等待 32 秒，如果服务端仍然没有回应 ACK，客户端就会终⽌三次握⼿。所以，总耗时是 1+2+4+8+16+32=63 秒。
 
+根据⽹络的稳定性和⽬标服务器的繁忙程度修改 SYN 的重传次数，调整客户端的三次握⼿时间上限。⽐如内⽹中通讯时，就可以适当调低重试次数，尽快把错误暴露给应⽤程序。  
 
+调整 SYN 半连接队列的长度：
 
+需要同时增大：
 
+```
+/proc/sys/net/ipv4/tcp_max_syn_backlog   
+/proc/sys/net/core/somaxconn
+```
+
+绕过半连接队列建立连接，syncookies：
+
+```
+/proc/sys/net/ipv4/tcp_syncookies
+```
+
+syncookies 参数主要有以下三个值：  
+
+- 0 值，表示关闭该功能  
+- 1 值，表示仅当 SYN 半连接队列放不下时，再启⽤它  
+- 2 值，表示⽆条件开启功能  
+
+调整 SYN+ACK 的重传次数：
+
+与重传 SYN 类似，SYN+ACK 的重传会经历 1、 2、 4、 8、 16 秒，最后⼀次重传后会继续等待 32 秒，如果服务端仍然没有收到 ACK，才会关闭连接，故共需要等待 63 秒。  
+
+```
+/proc/sys/net/ipv4/tcp_synack_retries
+```
+
+全连接队列满时，直接回复 RST：
+
+```
+/proc/sys/net/ipv4/tcp_abort_on_overflow
+```
+
+tcp_abort_on_overflow 共有两个值分别是 0 和 1，其分别表示：  
+
+- 0 ：如果 accept 队列满了，那么 server 扔掉 client 发过来的 ack  
+- 1 ：如果 accept 队列满了， server 发送⼀个 RST 包给 client，表示废掉这个握⼿过程和这个连接  
+
+tcp_abort_on_overflow 设为 0 可以提⾼连接建⽴的成功率，只有你⾮常肯定 TCP 全连接队列会⻓期溢出时，才能设置为 1 以尽快通知客户端。
+
+全连接队列的长度：
+
+全连接队列的⻓度取决于 somaxconn 和 backlog 之间的最⼩值，也就是 min(somaxconn, backlog)，其中：  
+
+- somaxconn 是 Linux 内核的参数，默认值是 128，可以通过 net.core.somaxconn 来设置其值  
+
+- backlog 是 listen(int sockfd, int backlog) 函数中的 backlog ⼤⼩  
+
+TCP Fast Open：
+
+在 Linux 3.7 内核版本之后，提供了 TCP Fast Open 功能，这个功能可以减少 TCP 连接建⽴的时延：
+
+```
+/proc/sys/net/ipv4/tcp_fastopen
+```
+
+tcp_fastopn 各个值的意义:  
+
+- 0：关闭  
+- 1：作为客户端使⽤ Fast Open 功能  
+- 2：作为服务端使⽤ Fast Open 功能  
+- 3：⽆论作为客户端还是服务器，都可以使⽤ Fast Open 功能  
+
+TCP Fast Open 功能需要客户端和服务端同时⽀持，才有效果。  
+
+![](./img/tcp_fast_open.png)
+
+在客户端⾸次建⽴连接时的过程：
+
+- 客户端发送 SYN 报⽂，该报⽂包含 Fast Open 选项，且该选项的 Cookie 为空，这表明客户端请求 Fast Open Cookie
+- ⽀持 TCP Fast Open 的服务器⽣成 Cookie，并将其置于 SYN-ACK 数据包中的 Fast Open 选项以发回客户端
+- 客户端收到 SYN-ACK 后，本地缓存 Fast Open 选项中的 Cookie
+
+所以，第⼀次发起 HTTP GET 请求的时候，还是需要正常的三次握⼿流程。 之后，如果客户端再次向服务器建⽴连接时的过程：  
+
+- 客户端发送 SYN 报⽂，该报⽂包含数据（对于⾮ TFO 的普通 TCP 握⼿过程， SYN 报⽂中不包含数据）以及此前记录的 Cookie
+- ⽀持 TCP Fast Open 的服务器会对收到 Cookie 进⾏校验：如果 Cookie 有效，服务器将在 SYN-ACK 报⽂中对 SYN 和数据进⾏确认，服务器随后将数据递送⾄相应的应⽤程序；如果 Cookie ⽆效，服务器将丢弃 SYN 报⽂中包含的数据，且其随后发出的 SYN-ACK 报⽂将只确认 SYN 的对应序列号
+- 如果服务器接受了 SYN 报⽂中的数据，服务器可在握⼿完成之前发送数据， 这就减少了握⼿带来的1 个 RTT 的时间消耗
+- 客户端将发送 ACK 确认服务器发回的 SYN 以及数据，但如果客户端在初始的 SYN 报⽂中发送的数据没有被确认，则客户端将重新发送数据
+- 此后的 TCP 连接的数据传输过程和⾮ TFO 的正常情况⼀致   
+
+所以，之后发起 HTTP GET 请求的时候，可以绕过三次握⼿，这就减少了握⼿带来的 1 个 RTT 的时间消耗。  
+
+开启了 TFO 功能， cookie 的值是存放到 TCP option 字段⾥的，客户端在请求并存储了 Fast Open Cookie 之后，可以不断重复 TCP Fast Open 直⾄服务器认为 Cookie ⽆效（通常为过期）。
+
+  
 
 ## 初始序列号 ISN
 
