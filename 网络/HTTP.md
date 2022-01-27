@@ -375,6 +375,8 @@ DIGEST 认证的认证步骤：
 
 ## Session、Cookie
 
+Session 和 Cookie 的主要目的就是为了弥补 HTTP 的无状态特性。
+
 Cookie 是由 Web 服务器保存在用户浏览器上的小文件（key-value格式），包含用户相关的信息。客户端向服务器发起请求，如果服务器需要记录该用户状态，就使用 response 向客户端浏览器颁发一个 Cookie。客户端浏览器会把 Cookie 保存起来。当浏览器再请求该网站时，浏览器把请求的网址连同该 Cookie 一同提交给服务器。服务器检查该 Cookie，以此来辨认用户身份。
 
 Session 是依赖 Cookie 实现的。Session 是服务器端对象。Session 是浏览器和服务器会话过程中，服务器分配的一块储存空间。服务器默认为浏览器在 Cookie 中设置 SessionID，浏览器在向服务器请求过程中传输 Cookie 包含 SessionID，服务器根据 SessionID 获取出会话中存储的信息，然后确定会话的身份信息。
@@ -383,9 +385,10 @@ Session 是依赖 Cookie 实现的。Session 是服务器端对象。Session 是
 
 ![](./img/session_cookie2.png)
 
-- 首先，客户端会发送一个http请求到服务器端
-- 服务器端接受客户端请求后，建立一个 session，并发送一个 http 响应到客户端，这个响应头，其中就包含 Set-Cookie 头部。该头部包含了 SessionId
-- 在客户端发起的第二次请求，假如服务器给了 set-Cookie，浏览器会自动在请求头中添加 Cookie
+- 首先，客户端会发送一个 http 请求到服务器端
+- 服务器端接受客户端请求后，开辟一快 Session 空间，即创建一个 Session 对象，同时生成一个 SessionId，并通过响应头 Set-Cookie:JSESSIONID=XXXXXX  命令，向客户端发送要求设置 Cookie 的响应
+- 客户端收到响应之后，在本机端设置一个 JSESSIONID=XXXXXX 的 Cookie 信息，该 Cookie 的过期时间为浏览器会话结束
+- 接下来客户端每次向同一个网站发送请求时，请求头都会带上 Cookie 信息(包含 SessionId)，然后服务器通过读取请求头中的 Cookie 信息获取名称为 JSESSIONID 的值，得到此次请求的 SessionId
 
 Cookie 与 Session 区别：
 
@@ -393,6 +396,8 @@ Cookie 与 Session 区别：
 - 存储空间：单个 Cookie 保存的数据不能超过 4K，很多浏览器都限制一个站点最多保存 20个 Cookie，Session 无此限制
 - 占用服务器资源：Session 一定时间内保存在服务器上，当访问增多，占用服务器性能，考虑到服务器性能方面，应当使用 Cookie
 - 有效期：Session  在超时或者客户端关闭时就会失效，Cookie 可以设置长时间保存
+
+
 
 现在大多都是 Session + Cookie 的使用方式：使用 Session 只需要在客户端保存一个 SessionId，实际上大量数据都是保存在服务端。如果全部用 Cookie，数据量大的时候客户端是没有那么多空间的。如果只用 Cookie 不用 Session，那么账户信息全部保存在客户端，一旦被劫持，全部信息都会泄露。并且客户端数据量变大，网络传输的数据量也会变大。
 
