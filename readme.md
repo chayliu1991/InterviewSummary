@@ -1,13 +1,5 @@
 网络：
 
-https://blog.nowcoder.net/n/d74de7cdf61b4407a650439f1690a839
-
-https://python.iitter.com/other/167767.html
-
-https://www.nowcoder.com/discuss/1937
-
-https://www.iamshuaidi.com/673.html
-
 https://github.com/G-MIng/JAVA2019
 
 https://jiangren.work/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/
