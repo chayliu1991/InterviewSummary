@@ -2,10 +2,6 @@
 
 https://github.com/G-MIng/JAVA2019
 
-https://jiangren.work/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/
-
-https://blog.csdn.net/qq_45911678/category_11485698.html?spm=1001.2014.3001.5482
-
 
 
 
