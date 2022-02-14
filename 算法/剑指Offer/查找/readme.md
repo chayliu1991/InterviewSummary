@@ -180,9 +180,9 @@ public:
                 left = mid + 1;
         }
 
-        if(nums[right] != target)
+        if(nums[left] != target)
             return 0;
-        int begin = right;
+        int begin = left;
         left = 0,right = nums.size()-1;
         while(left < right)
         {
