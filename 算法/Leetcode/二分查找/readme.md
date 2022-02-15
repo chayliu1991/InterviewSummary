@@ -306,107 +306,25 @@ public:
 class Solution {
 public:
     bool searchMatrix(vector<vector<int>>& matrix, int target) {
-        if(matrix.empty())
-            return false;
-
-        int rows = matrix.size(),cols = matrix[0].size();
-        int first = 0,last = rows * cols;
-        while(first < last)
-        {
-            int mid = first + ((last - first) >> 1);
-            int value = matrix[mid / cols][mid % cols];
-            if(value == target)
-                return true;
-            else if(value < target)
-                first = mid + 1;
-            else
-                last = mid;
-        }
-        return false;
+		if(matrix.empty() || matrix[0].empty())
+			return false;		
+		int rows = matrix.size(),cols = matrix[0].size();
+		int left = 0,right = rows * cols - 1;
+		while(left <= right)
+		{
+			int mid = left + (right - left) / 2;
+			int value = matrix[mid/cols][mid%cols];
+			if(value == target)
+				return true;
+			else if(value > target)
+				right = mid - 1;
+			else
+				left = mid + 1;				
+		}
+		return false;
     }
 };
 ```
-
-# 二分查找总结
-
-## 解题步骤
-
-- 预处理：如果序列未排序，则先进行排序
-- 二分查找：
-  - 使用循环或递归将中间值元素与目标元素进行比较，将区间划分为两个子区间
-  - 然后在符合条件的其中一个子区间内进行寻找，直至循环或递归结束
-- 后处理：在循环或递归完成后，需要对剩余区间的元素中确定符合条件的元素
-
-## 解题模板
-
-### 标准二分查找
-
-寻找等于 X 的任意位置：
-
-```
-int search(std::vector<int> nums,int target)
-{
-	int left = 0,right = nums.size() - 1;
-	while(left <= right)  //@ 1,终止条件： left > right,即 left = right + 1
-	{
-		int mid = left + ((right - left) >> 1);
-		if(nums[mid] == target)
-			return mid;
-		else if(nums[mid] > target)
-			right = mid - 1;
-		else
-			left = mid + 1;
-	}
-	return -1;
-}
-```
-
-### 寻找左边界
-
-将区间 `[l, r]` 划分成 `[l, mid]` 和 `[mid + 1, r]` :
-
-```
-int search(std::vector<int> nums,int target)
-{
-	int left = 0,right = nums.size() - 1;
-	while(left < right)  //@ 1,终止条件： left = right
-	{
-		int mid = left + ((right - left) >> 1);
-		else if(nums[mid] >= target)
-			right = mid;
-		else
-			left = mid + 1;
-	}
-	return nums[left] >= target ? left : -1;
-}
-```
-
-### 寻找右边界
-
-将区间 `[l, r]` 划分成 `[l, mid - 1]` 和 `[mid, r]` ：
-
-```
-int search(std::vector<int> nums,int target)
-{
-	int left = 0,right = nums.size() - 1;
-	while(left < right)  //@ 1,终止条件： left = right
-	{
-		//@ 向上取整，在left与right相差为1时，left可以取到right而不会造成死循环
-		int mid = left + ((right - left + 1) >> 1);
-		else if(nums[mid] <= target)
-			left = mid;
-		else
-			right = mid - 1;
-	}
-	return nums[right] <= target ? right : -1;
-}
-```
-
-
-
-
-
-
 
 
 
