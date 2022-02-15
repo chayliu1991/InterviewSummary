@@ -75,3 +75,10 @@ int search(std::vector<int> nums,int target)
 - [74. 搜索二维矩阵](https://leetcode-cn.com/problems/search-a-2d-matrix/)
 
 
+# 动态规划
+
+- [19. 正则表达式匹配](https://leetcode-cn.com/problems/zheng-ze-biao-da-shi-pi-pei-lcof/)
+- [46. 把数字翻译成字符串](https://leetcode-cn.com/problems/ba-shu-zi-fan-yi-cheng-zi-fu-chuan-lcof/)
+- [48. 最长不含重复字符的子字符串](https://leetcode-cn.com/problems/zui-chang-bu-han-zhong-fu-zi-fu-de-zi-zi-fu-chuan-lcof/)
+- [49. 丑数](https://leetcode-cn.com/problems/chou-shu-lcof/)
+- [60. n个骰子的点数](https://leetcode-cn.com/problems/nge-tou-zi-de-dian-shu-lcof/)

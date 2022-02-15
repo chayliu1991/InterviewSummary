@@ -1,7 +1,5 @@
 # [10- I. 斐波那契数列](https://leetcode-cn.com/problems/fei-bo-na-qi-shu-lie-lcof/)
 
-- dp
-
 ```
 class Solution {
 public:
@@ -23,8 +21,6 @@ public:
 ```
 
 # [10- II. 青蛙跳台阶问题](https://leetcode-cn.com/problems/qing-wa-tiao-tai-jie-wen-ti-lcof/)
-
-- dp
 
 ```
 class Solution {
@@ -96,27 +92,24 @@ public:
 class Solution {
 public:
     int maxSubArray(vector<int>& nums) {
-        if(nums.empty())
-            return 0;
-        int res = INT_MIN;
-        int sum = 0;
-        for(int i = 0;i < nums.size();i++)
-        {
-            if(sum < 0)
-                sum = nums[i];
-            else
-                sum += nums[i];
-            
-            res = max(res,sum);
-        }
-        return res;
+		if(nums.empty())
+			return 0;
+		
+		int res = INT_MIN,curr = 0;
+		for(const auto n : nums)
+		{
+			if(curr > 0)
+				curr += n;
+			else
+				curr = n;
+			res = std::max(res,curr);
+		}
+		return res;
     }
 };
 ```
 
 # [46. 把数字翻译成字符串](https://leetcode-cn.com/problems/ba-shu-zi-fan-yi-cheng-zi-fu-chuan-lcof/)
-
-- dp
 
 ```
 class Solution {
@@ -133,37 +126,14 @@ public:
         for(int i = 2;i <= len;i++)
         {
             dp[i] = dp[i-1];
-            if(str[i-2] == '1' || (str[i-2] == '2' && str[i-1] <= '5')) //@ 10 ~25
+            if(str.substr(i-2,2) <= "25" && str.substr(i-2,2) >= "10") 
                 dp[i] = dp[i-2]+dp[i-1];
         }
         return dp.back();
     }
 };
 ```
-- 状态压缩
-```
-class Solution {
-public:
-    int translateNum(int num) {
-        std::string str = std::to_string(num);
-        return back_trace(str,0);
-    }
-
-    int back_trace(std::string& s,int i)
-    {
-        int n = s.length();
-        if(i == n)
-            return 1;
-        if(i == n-1 || s[i] == '0' || s.substr(i,2) > "25")
-            return back_trace(s,i+1);
-        return back_trace(s,i+1) + back_trace(s,i+2);
-    }
-};
-```
-
 # [47. 礼物的最大价值](https://leetcode-cn.com/problems/li-wu-de-zui-da-jie-zhi-lcof/)
-
-- dp
 
 ```
 class Solution {
