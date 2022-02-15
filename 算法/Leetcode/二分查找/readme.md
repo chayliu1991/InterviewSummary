@@ -385,6 +385,8 @@ int search(std::vector<int> nums,int target)
 
 ### 寻找左边界
 
+将区间 `[l, r]` 划分成 `[l, mid]` 和 `[mid + 1, r]` :
+
 ```
 int search(std::vector<int> nums,int target)
 {
@@ -401,7 +403,9 @@ int search(std::vector<int> nums,int target)
 }
 ```
 
-### 寻找有边界
+### 寻找右边界
+
+将区间 `[l, r]` 划分成 `[l, mid - 1]` 和 `[mid, r]` ：
 
 ```
 int search(std::vector<int> nums,int target)
