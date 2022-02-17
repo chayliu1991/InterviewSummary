@@ -20,7 +20,32 @@ public:
     }
 };
 ```
-
+```
+class Solution {
+public:
+    vector<int> postorderTraversal(TreeNode* root) {
+        if(root == nullptr)
+            return {};
+        
+        std::vector<int> res;
+        std::stack<TreeNode*> s;
+		s.push(root);
+		while(!s.empty())
+		{
+			auto curr = s.top();
+			s.pop();
+			res.push_back(curr->val);
+			if(curr->left)
+				s.push(curr->left);
+			if(curr->right)
+				s.push(curr->right);		
+		}
+		
+		std::reverse(res.begin(),res.end());
+        return res;
+    }
+};
+```
 ```
 class Solution {
 public:
@@ -191,40 +216,6 @@ public:
         postorder(vec,root->left);
         postorder(vec,root->right);
         vec.emplace_back(root->val);
-    }
-};
-```
-
-```
-class Solution {
-public:
-    vector<int> postorderTraversal(TreeNode* root) {
-        if(root == nullptr)
-            return {};
-        
-        std::vector<int> res;
-        std::stack<TreeNode*> s;
-        s.push(root);
-        while(!s.empty())
-        {
-            TreeNode* curr = s.top();
-            if(curr != nullptr)
-            {
-                s.push(nullptr);
-                if (curr->right) 
-                    s.push(curr->right);
-                if (curr->left) 
-                    s.push(curr->left);
-            }
-            else
-            {
-                s.pop();
-                curr = s.top();
-                s.pop();
-                res.push_back(curr->val);
-            }
-        }
-        return res;
     }
 };
 ```
