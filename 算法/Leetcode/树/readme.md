@@ -1,5 +1,3 @@
-
-
 # [144. 二叉树的前序遍历](https://leetcode-cn.com/problems/binary-tree-preorder-traversal/)
 
 ```
@@ -42,6 +40,42 @@ public:
                 s.push(curr->right);
             if(curr->left)
                  s.push(curr->left);
+        }
+        return res;
+    }
+};
+```
+
+```
+class Solution {
+public:
+    vector<int> preorderTraversal(TreeNode* root) {
+        if(root == nullptr)
+            return {};
+        
+        std::vector<int> res;
+        std::stack<TreeNode*> s;
+        s.push(root);       
+        while(!s.empty())
+        {
+            TreeNode* curr = s.top();
+			if(curr)
+			{
+				s.pop();
+				if(curr->right)
+					s.push(curr->right);
+				if(curr->left)
+					s.push(curr->left);
+				s.push(curr);
+				s.push(nullptr);
+			}
+			else
+			{
+				s.pop();
+				curr = s.top();
+				s.pop();
+				res.emplace_back(curr->val);
+			}
         }
         return res;
     }
@@ -100,6 +134,43 @@ public:
 };
 ```
 
+```
+class Solution {
+public:
+    vector<int> inorderTraversal(TreeNode* root) {
+		if(root == nullptr)
+			return {};
+		
+		std::vector<int> res;
+		std::stack<TreeNode*> s;
+		s.push(root);       
+		while(!s.empty())
+		{
+			TreeNode* curr = s.top();
+			if(curr)
+			{
+				s.pop();
+				if(curr->right)
+					s.push(curr->right);
+				s.push(curr);
+				s.push(nullptr);
+				
+				if(curr->left)
+					s.push(curr->left);
+			}
+			else
+			{
+				s.pop();
+				curr = s.top();
+				s.pop();
+				res.emplace_back(curr->val);
+			}
+		}
+		return res;
+    }
+};
+```
+
 # [145. 二叉树的后序遍历](https://leetcode-cn.com/problems/binary-tree-postorder-traversal/)
 
 ```
@@ -154,6 +225,43 @@ public:
             }
         }
         return res;
+    }
+};
+```
+
+```
+class Solution {
+public:
+    vector<int> postorderTraversal(TreeNode* root) {
+		if(root == nullptr)
+			return {};
+		
+		std::vector<int> res;
+		std::stack<TreeNode*> s;
+		s.push(root);       
+		while(!s.empty())
+		{
+			TreeNode* curr = s.top();
+			if(curr)
+			{
+				s.pop();
+				s.push(curr);
+				s.push(nullptr);
+				
+				if(curr->right)
+					s.push(curr->right);				
+				if(curr->left)
+					s.push(curr->left);
+			}
+			else
+			{
+				s.pop();
+				curr = s.top();
+				s.pop();
+				res.emplace_back(curr->val);
+			}
+		}
+		return res;
     }
 };
 ```
