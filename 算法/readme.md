@@ -92,6 +92,7 @@ int search(std::vector<int> nums,int target)
 - [309. 最佳买卖股票时机含冷冻期](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/)
 - [714. 买卖股票的最佳时机含手续费](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/)
 - [300. 最长递增子序列](https://leetcode-cn.com/problems/longest-increasing-subsequence/)
-- [354. 俄罗斯套娃信封问题](https://leetcode-cn.com/problems/russian-doll-envelopes/)
-
+- [1143. 最长公共子序列](https://leetcode-cn.com/problems/longest-common-subsequence/)
+- [416. 分割等和子集](https://leetcode-cn.com/problems/partition-equal-subset-sum/)
+- [322. 零钱兑换](https://leetcode-cn.com/problems/coin-change/)
 
