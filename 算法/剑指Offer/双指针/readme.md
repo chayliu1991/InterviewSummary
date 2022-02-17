@@ -90,3 +90,40 @@ public:
     }
 };
 ```
+# [392. 判断子序列](https://leetcode-cn.com/problems/is-subsequence/)
+
+```
+class Solution {
+public:
+    bool isSubsequence(string s, string t) {
+        int i = 0,j = 0;
+		int m = s.length(),n = t.length();
+		while(i < m && j < n)
+		{
+			if(s[i] == t[j])
+				i++;
+			j++;
+		}
+		return i == m;
+    }
+};
+```
+# [455. 分发饼干](https://leetcode-cn.com/problems/assign-cookies/)
+
+```
+class Solution {
+public:
+    int findContentChildren(vector<int>& g, vector<int>& s) {
+        sort(g.begin(),g.end());
+        sort(s.begin(),s.end());
+        int child = 0 ,cookie = 0;
+        while(child < g.size() && cookie < s.size())
+        {
+            if(g[child] <= s[cookie])
+                ++child;
+            ++cookie; 
+        }
+        return child;
+    }
+};
+```

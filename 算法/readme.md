@@ -97,3 +97,11 @@ int search(std::vector<int> nums,int target)
 - [322. 零钱兑换](https://leetcode-cn.com/problems/coin-change/)
 
 
+# 贪心
+
+- [376. 摆动序列](https://leetcode-cn.com/problems/wiggle-subsequence/)
+- [406. 根据身高重建队列](https://leetcode-cn.com/problems/queue-reconstruction-by-height/)
+- [134. 加油站](https://leetcode-cn.com/problems/gas-station/)
+- [55. 跳跃游戏](https://leetcode-cn.com/problems/jump-game/)
+- [135. 分发糖果](https://leetcode-cn.com/problems/candy/)
+

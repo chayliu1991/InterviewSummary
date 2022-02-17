@@ -86,16 +86,19 @@ public:
 class Solution {
 public:
     vector<vector<int>> reconstructQueue(vector<vector<int>>& people) {
-        sort(people.begin(),people.end(),[](const vector<int>& lhs,const vector<int>& rhs){
-            return lhs[0] > rhs[0] || (lhs[0] == rhs[0] && lhs[1] < rhs[1]);
-        });
+		std::sort(people.begin(),people.end(),[](vector<int>& v1,vector<int>& v2)
+		{
+			if(v1[0] == v2[0])
+				return v1[1] < v2[1];
+			return v1[0] > v2[0];
+		});
 
-        vector<vector<int>> res;
-        for(auto const p : people)
-        {
-            res.insert(res.begin() + p[1],p);
-        }
-        return res;
+		vector<vector<int>> res;
+		for(const auto p : people)
+		{
+			res.insert(res.begin()+ p[1],p);
+		}
+		return res;
     }
 };
 ```
@@ -105,25 +108,24 @@ public:
 ```
 class Solution {
 public:
-   int canCompleteCircuit(vector<int>& gas, vector<int>& cost) {
-        int total_gas = accumulate(gas.begin(),gas.end(),0);
-        int total_cost = accumulate(cost.begin(),cost.end(),0);
+    int canCompleteCircuit(vector<int>& gas, vector<int>& cost) {
+		int total_gas = std::accumulate(gas.begin(),gas.end(),0);
+		int total_cost = std::accumulate(cost.begin(),cost.end(),0);
 
-        if(total_cost > total_gas) 
-            return -1;
-        int remain = 0,start = 0;
-        for(int i=0;i<gas.size();++i)
-        {
-            if(remain + gas[i] < cost[i])
-            {
-                remain = 0;
-                start = i + 1;
-            }                
-            else
-                remain += gas[i] - cost[i];
-        }
-
-        return start;
+		if(total_cost > total_gas)
+			return -1;
+		int remain = 0,start = 0;
+		for(int i = 0;i < gas.size();i++)
+		{
+			if(remain + gas[i] < cost[i])
+			{
+				remain = 0;
+				start = i + 1;
+			}
+			else
+				remain += gas[i] - cost[i];
+		}
+		return start;
     }
 };
 ```
@@ -136,33 +138,22 @@ public:
    bool canJump(vector<int>& nums) 
    {
        int longest = 0;
-       for(int i=0;i<nums.size();i++)
+	   int n = nums.size();
+
+       for(int i = 0;i < n;i++)
        {
-           if(i > longest)
-                return false;
-            longest = max(longest,i+nums[i]);
+		   if(i <= longest)
+		   {
+			   longest = std::max(longest,i+nums[i]);
+			   if(longest >= n-1)
+			   	return true;
+		   }
        }
-       return true;
+       return false;
    }
 };
 ```
 
-# [392. 判断子序列](https://leetcode-cn.com/problems/is-subsequence/)
-
-```
-class Solution {
-public:
-    bool isSubsequence(string s, string t) {
-        int k = 0;
-        for(int i=0;i<t.size() && k<s.size();i++)
-        {
-            if(t[i] == s[k])
-                k++;
-        }
-        return k == s.size();
-    }
-};
-```
 
 # [316. 去除重复字母](https://leetcode-cn.com/problems/remove-duplicate-letters/)
 
@@ -191,25 +182,7 @@ public:
 };
 ```
 
-# [455. 分发饼干](https://leetcode-cn.com/problems/assign-cookies/)
 
-```
-class Solution {
-public:
-    int findContentChildren(vector<int>& g, vector<int>& s) {
-        sort(g.begin(),g.end());
-        sort(s.begin(),s.end());
-        int child = 0 ,cookie = 0;
-        while(child < g.size() && cookie < s.size())
-        {
-            if(g[child] <= s[cookie])
-                ++child;
-            ++cookie; 
-        }
-        return child;
-    }
-};
-```
 
 # [135. 分发糖果](https://leetcode-cn.com/problems/candy/)
 
@@ -217,16 +190,22 @@ public:
 class Solution {
 public:
     int candy(vector<int>& ratings) {
-        int size = ratings.size();
-        if(size < 2) return size;
-        vector<int> candies(size,1);
-        for(int i=1;i<size;i++)
-            if(ratings[i] > ratings[i-1])
-                candies[i] = candies[i-1]+1;
-        for(int i=size-1;i>0;i--)
-            if(ratings[i-1] > ratings[i])
-                candies[i-1] = max(candies[i-1],candies[i]+1);        
-        return accumulate(candies.begin(),candies.end(),0);
+		int n = ratings.size();
+		if(n <= 1)
+			return n;
+		std::vector<int> dp(n,1);
+		for(int i = 1;i < n;i++)
+		{
+			if(ratings[i] > ratings[i-1])
+				dp[i] = dp[i-1] + 1;
+		}
+		
+		for(int i = n-1;i > 0;i--)
+		{
+			if(ratings[i-1] > ratings[i])
+				dp[i-1] = std::max(dp[i-1],dp[i]+1);
+		}
+		return std::accumulate(dp.begin(),dp.end(),0);
     }
 };
 ```
