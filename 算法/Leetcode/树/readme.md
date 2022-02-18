@@ -454,22 +454,25 @@ public:
 ```
 class Solution {
 public:
-    long long prev = LLONG_MIN;
-    bool validBST(TreeNode* root)
-    {
-        if(root == nullptr)
-            return true;
-        if(!validBST(root->left))
-            return false;
-        if(root->val <= prev)
-            return false;
-        prev = root->val;
-        return validBST(root->right);
-    }
-
     bool isValidBST(TreeNode* root) {
-        return validBST(root);
+		std::vector<int> vec;
+		inorder(root,vec);
+		for(int i = 1;i < vec.size();i++)
+		{
+			if(vec[i] <= vec[i-1])
+				return false;
+		}
+		return true;
     }
+	
+	void inorder(TreeNode* root,std::vector<int>& res)
+	{
+		if(root == nullptr)
+			return;
+		inorder(root->left,res);
+		res.emplace_back(root->val);
+		inorder(root->right,res);
+	}
 };
 ```
 
