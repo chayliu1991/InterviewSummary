@@ -954,23 +954,22 @@ public:
 ```
 class Solution {
 public:
-    bool isSubtree(TreeNode* s, TreeNode* t) {
-        if(s == nullptr)
-            return false;
-        return isSubtree(s->left,t) || sameTree(s,t) || isSubtree(s->right,t);
+    bool isSubtree(TreeNode* root, TreeNode* subRoot) {
+		if(root == nullptr)
+			return false;
+		return same(root,subRoot) || isSubtree(root->left,subRoot) || isSubtree(root->right,subRoot);
     }
-
-    bool sameTree(TreeNode* s, TreeNode* t)
-    {
-        if(s == nullptr && t == nullptr)
-            return true;
-        if(s == nullptr || t == nullptr)
-            return false;
-        if(s->val != t->val)
-            return false;
-        
-        return sameTree(s->left,t->left) && sameTree(s->right,t->right);
-    }
+	
+	bool same(TreeNode* tree1, TreeNode* tree2)
+	{
+		if(tree1 == nullptr && tree2 == nullptr)
+			return true;
+		if(tree1 == nullptr || tree2 == nullptr)
+			return false;
+		if(tree1->val != tree2->val)
+			return false;
+		return same(tree1->left,tree2->left) && same(tree1->right,tree2->right);
+	}	
 };
 ```
 

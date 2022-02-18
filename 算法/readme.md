@@ -117,8 +117,9 @@ int search(std::vector<int> nums,int target)
 - [113. 路径总和 II](https://leetcode-cn.com/problems/path-sum-ii/)
 - [226. 翻转二叉树](https://leetcode-cn.com/problems/invert-binary-tree/)
 - [617. 合并二叉树](https://leetcode-cn.com/problems/merge-two-binary-trees/)
-
-
+- [572. 另一个树的子树](https://leetcode-cn.com/problems/subtree-of-another-tree/)
+- [236. 二叉树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-tree/)
+- [101. 对称二叉树](https://leetcode-cn.com/problems/symmetric-tree/)
 
 
 
