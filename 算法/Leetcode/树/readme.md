@@ -1030,18 +1030,18 @@ public:
     bool isSymmetric(TreeNode* root) {
         if(root == nullptr)
             return true;
-        return  _Symmetric(root->left,root->right);
+        return symmetric(root->left,root->right);
     }
 
-    bool _Symmetric(TreeNode* left,TreeNode* right)
+    bool symmetric(TreeNode* node1,TreeNode* node2)
     {
-        if(left == nullptr && right == nullptr)
+        if(node1 == nullptr && node2 == nullptr)
             return true;
-        if(left == nullptr || right == nullptr)
+        if(node1 == nullptr || node2 == nullptr)
             return false;
-        if(left->val != right->val)
+        if(node1->val != node2->val)
             return false;
-        return _Symmetric(left->left,right->right) && _Symmetric(left->right,right->left);
+        return symmetric(node1->left,node2->right) && symmetric(node1->right,node2->left);
     }
 };
 ```
@@ -1080,32 +1080,31 @@ public:
 # [109. 有序链表转换二叉搜索树](https://leetcode-cn.com/problems/convert-sorted-list-to-binary-search-tree/)
 
 ```
-
 class Solution {
 public:
     TreeNode* sortedListToBST(ListNode* head) {
-        vector<int> v;
-        ListNode* curr = head;
+        std::vector<int> vec;
+        auto* curr = head;
         while(curr)
         {
-            v.push_back(curr->val);
+            vec.push_back(curr->val);
             curr = curr->next;
         }
-        return vec2BST(v);     
+        return to_bst(vec);
     }
-
-    TreeNode* vec2BST(vector<int>& vec)
+    
+    TreeNode* to_bst(const std::vector<int>& vec)
     {
         if(vec.empty())
             return nullptr;
-        if(vec.size() == 1)
+        int n = vec.size();
+        if(n == 1)
             return new TreeNode(vec.front());
-
-        TreeNode* root = new TreeNode(vec[vec.size()/2]);
-        vector<int> left(vec.begin(),vec.begin()+vec.size()/2);
-        vector<int> right(vec.begin()+vec.size()/2+1,vec.end());
-        root->left = vec2BST(left);
-        root->right = vec2BST(right);
+        TreeNode* root = new TreeNode(vec[n/2]);
+        std::vector<int> lv(vec.begin(),vec.begin()+n/2);
+        std::vector<int> rv(vec.begin()+n/2+1,vec.end());
+        root->left = to_bst(lv);
+        root->right = to_bst(rv);
         return root;
     }
 };
@@ -1146,34 +1145,27 @@ public:
 class Solution {
 public:
     bool isCompleteTree(TreeNode* root) {
-        if(root == nullptr)
-            return true;
-        queue<TreeNode*> q;
-        q.push(root);
-        bool final = false;
-        while(!q.empty())
-        {
-            auto t = q.front();
-            q.pop();
-            if(t->left != nullptr)
-            {
-                if(final)
-                    return false;
-                q.push(t->left);
-            }
-            else
-                final = true;
-            if(t->right != nullptr)
-            {
-                if(final)
-                    return false;
-                q.push(t->right);
-            }
-            else
-                final = true;
-            
-        }
-        return true;
+		if(root == nullptr)
+			return true;
+		std::queue<TreeNode*> q;
+		q.push(root);
+		bool reach_null{false};
+		while(!q.empty())
+		{
+			auto curr = q.front();
+			q.pop();
+			if(curr == nullptr)
+			{
+				reach_null = true;
+				continue;
+			}
+			
+			if(reach_null)
+				return false;
+			q.push(curr->left);
+			q.push(curr->right);
+		}
+		return true;
     }
 };
 ```
@@ -1183,27 +1175,45 @@ public:
 ```
 class Solution {
 public:
-    unordered_map<int,int> dict;
     TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
-         if(preorder.empty())
+        if(preorder.size() != inorder.size() || preorder.empty())
             return nullptr;
-        for(int i = 0;i < inorder.size();++i)
-            dict[inorder[i]] = i;
-        return build(preorder,0,preorder.size()-1,0);
+        int value = preorder[0];
+        TreeNode* root = new TreeNode(value);
+        auto pos = std::find(inorder.begin(),inorder.end(),value);
+        std::vector<int> linor(inorder.begin(),pos);
+        std::vector<int> rinor(pos+1,inorder.end());
+        int left = linor.size();
+        std::vector<int> lpre(preorder.begin()+1,preorder.begin()+1+left);
+        std::vector<int> rpre(preorder.begin()+1+left,preorder.end());
+        root->left = buildTree(lpre,linor);
+        root->right = buildTree(rpre,rinor);
+        return root;
+    }
+};
+```
+
+```
+class Solution {
+public:
+    std::unordered_map<int,int> hash;
+
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        for(int i = 0;i < inorder.size();i++)
+            hash[inorder[i]] = i;
+        return build(preorder,inorder,0,preorder.size()-1,0,inorder.size()-1);
     }
 
-    //@ start:中序遍历的起始位置,end:中序遍历的终止位置,rootIndex:前序遍历根节点的位置
-    TreeNode* build(vector<int>& preorder,int start,int end,int rootIndex)
+    TreeNode* build(vector<int>& pre, vector<int>& inor,int pre_start,int pre_end,int inor_start,int inor_end)
     {
-        if(start > end)
-            return nullptr;        
-        int val = preorder[rootIndex];
-        TreeNode* root = new TreeNode(val);
-        int index = dict[val],leftLen = index-start-1;
-
-        root->left = build(preorder,start,index - 1,rootIndex+1);
-        root->right = build(preorder,index + 1,end,rootIndex+2+leftLen);
-        return root;
+        if(pre_start > pre_end)
+            return nullptr;
+		int pos = hash[pre[pre_start]];		
+        TreeNode* root = new TreeNode(pre[pre_start]);
+        int len = pos - inor_start;
+        root->left = build(pre,inor,pre_start+1,pre_start+len,inor_start,pos-1);
+        root->right = build(pre,inor,pre_start+1+len,pre_end,pos+1,inor_end);
+		return root;
     }
 };
 ```
@@ -1213,32 +1223,27 @@ public:
 ```
 class Solution {
 public:
-    TreeNode* constructFromPrePost(vector<int>& pre, vector<int>& post) {
-        int n = post.size();
-        if(n == 0) 
+    TreeNode* constructFromPrePost(vector<int>& preorder, vector<int>& postorder) {
+        return construct(preorder, postorder, 0, preorder.size() - 1, 0, postorder.size() - 1);
+    }
+
+    TreeNode* construct(vector<int>& pre, vector<int>& post, int pre_start, int pre_end, int post_start, int post_end) 
+	{
+        if (pre_start > pre_end)
             return nullptr;
-        TreeNode* root = new TreeNode(pre[0]);
-        if(n == 1) 
+        
+        TreeNode* root = new TreeNode(pre[pre_start]);
+        if (pre_start == pre_end)
             return root;
-        else
-        {
-            int L = 0;
-            for(int i=0; i<post.size();++i)
-                if(post[i]==pre[1])
-                    L = i+1;      
-            
-            //@ 跳过前序遍历的根节点
-            vector<int> Lpre(pre.begin()+1, pre.begin()+L+1);
-            //@ 前序遍历除了第一个根节点之后是连续的
-            vector<int> Rpre(pre.begin()+L+1, pre.end());
-            //@ 后序遍历从起始开始,长度为L
-            vector<int> Lpost(post.begin(), post.begin()+L);
-            //@ 后序遍历最后一个节点是根节点
-            vector<int> Rpost(post.begin()+L, post.end()-1);
-            root->left = constructFromPrePost(Lpre, Lpost);
-            root->right = constructFromPrePost(Rpre, Rpost);
-            return root;
-        }
+       
+        int i = post_start; 
+        while (i < post_end && post[i] != pre[pre_start + 1])
+            i++; 
+        
+        int len = i - post_start + 1;
+        root->left = construct(pre, post, pre_start + 1, pre_start + len, post_start, i);
+        root->right = construct(pre, post, pre_start + 1 + len, pre_end, i + 1, post_end - 1);
+        return root;
     }
 };
 ```

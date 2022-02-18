@@ -120,6 +120,9 @@ int search(std::vector<int> nums,int target)
 - [572. 另一个树的子树](https://leetcode-cn.com/problems/subtree-of-another-tree/)
 - [236. 二叉树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-tree/)
 - [101. 对称二叉树](https://leetcode-cn.com/problems/symmetric-tree/)
+- [109. 有序链表转换二叉搜索树](https://leetcode-cn.com/problems/convert-sorted-list-to-binary-search-tree/)
+- [958. 二叉树的完全性检验](https://leetcode-cn.com/problems/check-completeness-of-a-binary-tree/)
+- 
 
 
 
