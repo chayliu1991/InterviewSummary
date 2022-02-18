@@ -550,20 +550,22 @@ public:
 ```
 class Solution {
 public:
-    int _depth(TreeNode* root,int& diameter)
+    int depth(TreeNode* root,int& diameter)
     {
         if(root == nullptr)
             return 0;
-        int L = _depth(root->left,diameter);
-        int R = _depth(root->right,diameter);
-        diameter = max(L+R,diameter);
+        int L = depth(root->left,diameter);
+        int R = depth(root->right,diameter);
+        diameter = std::max(L+R+1,diameter);
         return max(L,R) + 1;        
     }
 
     int diameterOfBinaryTree(TreeNode* root) {
-        int diameter = 0;
-        _depth(root,diameter);
-        return diameter;
+       	if(root == nullptr)
+		   	return 0;
+		int res = 0;
+        depth(root,res);
+        return res -1 ;
     }
 };
 ```
