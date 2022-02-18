@@ -628,13 +628,15 @@ class Solution {
 public:
     TreeNode* searchBST(TreeNode* root, int val) {
 		if(root == nullptr)
-			return nullptr;
-		if(root->val == val)
 			return root;
-		else if(root->val > val)
+		if(root->val ==val)
+			return root;
+		if(root->val > val)
 			return searchBST(root->left,val);
-		else
+		if(root->val < val)
 			return searchBST(root->right,val);
+		
+		return nullptr;
     }
 };
 ```
@@ -682,29 +684,28 @@ public:
 ```
 class Solution {
 public:
-	vector<TreeNode*> inorderV;
-	void inorder(TreeNode* root)
+	void inorder(TreeNode* root,std::vector<TreeNode*>& nodes)
 	{
 		if(root == nullptr)
 			return;
 		
-		inorder(root->left);
-		inorderV.push_back(root);
-		inorder(root->right);
+		inorder(root->left,nodes);
+		nodes.push_back(root);
+		inorder(root->right,nodes);
 	}
 	
     TreeNode* increasingBST(TreeNode* root) {
         if(root == nullptr)
 			return nullptr;
-		inorder(root);	
-		for(int i=0;i<inorderV.size()-1;++i)
+		std::vector<TreeNode*> nodes;
+		inorder(root,nodes);	
+		for(int i = 1;i < nodes.size();++i)
 		{
-			inorderV[i]->left = nullptr;
-			inorderV[i]->right = inorderV[i+1];
+			nodes[i-1]->left = nullptr;
+			nodes[i-1]->right = nodes[i];
 		}
-		inorderV.back()->left = nullptr;
-		inorderV.back()->right = nullptr;
-        return inorderV.front();
+		nodes.back()->left = nodes.back()->right = nullptr;
+        return nodes.front();
     }
 };
 ```
@@ -738,7 +739,8 @@ public:
             return false;
         if(root->left == nullptr && root->right == nullptr)
             return sum == root->val;
-        return hasPathSum(root->left,sum - root->val) || hasPathSum(root->right,sum - root->val);
+		sum -= root->val;
+        return hasPathSum(root->left,sum) || hasPathSum(root->right,sum);
     }
 };
 ```
@@ -767,23 +769,24 @@ public:
 ```
 class Solution {
 public:
-    vector<vector<int>> res;
-    void dfs(TreeNode *root,vector<int> &path,int sum)
+    void dfs(TreeNode *root,vector<int> &path,vector<vector<int>>& res,int sum)  //@ sum 不能是引用
     {
-        if(!root)
+        if(root == nullptr)
             return;
         path.push_back(root->val);
         if(root->val == sum && (root->left == nullptr && root->right == nullptr))
-            res.push_back(path);
-        dfs(root->left,path,sum - root->val);
-        dfs(root->right,path,sum - root->val);
+            res.push_back(path);		
+		sum -= root->val;
+        dfs(root->left,path,res,sum);
+        dfs(root->right,path,res,sum);
         path.pop_back();
     }
 
     vector<vector<int>> pathSum(TreeNode* root, int sum) 
     {
         vector<int> path;
-        dfs(root,path,sum);
+		vector<vector<int>> res;
+        dfs(root,path,res,sum);
         return res;        
     }
 };
@@ -863,16 +866,15 @@ public:
 ```
 class Solution {
 public:
-    TreeNode* mergeTrees(TreeNode* t1, TreeNode* t2) {
-        if(t1 == nullptr)
-            return t2;
-        if(t2 == nullptr)
-            return t1;
-        
-        t1->val += t2->val;
-        t1->left = mergeTrees(t1->left,t2->left);
-        t1->right = mergeTrees(t1->right,t2->right);
-        return t1;
+    TreeNode* mergeTrees(TreeNode* root1, TreeNode* root2) {
+		if(root1 == nullptr)
+			return root2;
+		if(root2 == nullptr)
+			return root1;
+		root1->val += root2->val;
+		root1->left = mergeTrees(root1->left,root2->left);
+		root1->right = mergeTrees(root1->right,root2->right);
+		return root1;
     }
 };
 ```
