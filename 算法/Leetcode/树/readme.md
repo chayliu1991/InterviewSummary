@@ -297,44 +297,30 @@ public:
     vector<vector<int>> zigzagLevelOrder(TreeNode* root) {
         if(root == nullptr)
             return {};
-        vector<vector<int>> res;
-        stack<TreeNode*> s1,s2;
-        s1.push(root);
-        bool l2r = true;
-        vector<int> level;
-        while(!s1.empty() || !s2.empty())
-        {
-            TreeNode* node = nullptr;
-            if(l2r)
-            {
-                while(!s1.empty())
-                {
-                    node = s1.top();
-                    s1.pop();
-                    level.push_back(node->val);
-                    if(node->left)
-                        s2.push(node->left);
-                    if(node->right)
-                        s2.push(node->right);
-                }
-                l2r = false;
-            }
-            else
-            {
-                while(!s2.empty())
-                {
-                    node = s2.top();
-                    s2.pop();
-                    level.push_back(node->val);
-                    if(node->right)
-                        s1.push(node->right);
-                    if(node->left)
-                        s1.push(node->left);
-                }   
-                l2r = true;
-            }
-            res.push_back(move(level));                                   
-        }
+        std::vector<std::vector<int>> res;
+		std::queue<TreeNode*> q;
+		q.push(root);
+		bool l2r = true;
+		while(!q.empty())
+		{
+			std::deque<int> dq;
+			int n = q.size();
+			while(n--)
+			{
+				auto node = q.front();
+				q.pop();
+				if(l2r)
+					dq.emplace_back(node->val);
+				else
+					dq.emplace_front(node->val);
+				if(node->left)
+					q.push(node->left);
+				if(node->right)
+					q.push(node->right);
+			}
+			l2r = !l2r;
+			res.emplace_back(dq.begin(),dq.end());
+		}		
         return res;
     }
 };
@@ -346,30 +332,31 @@ public:
 class Solution {
 public:
     int findBottomLeftValue(TreeNode* root) {
-        if (nullptr == root)
-            return -1;  
-
-        int res = root->val;
-        queue<TreeNode*> que;
-        que.push(root);
-        while (!que.empty())
-        {
-            res = que.front()->val;
-            int len = que.size();             
-            for(int i=0;i<len;++i)
-            {
-                if (que.front()->left)
-                    que.push(que.front()->left);
-                if (que.front()->right)
-                    que.push(que.front()->right);
-                que.pop();
-            }
-        }
-        return res;
-    }
+		if(root == nullptr)
+			return -1;
+		std::queue<TreeNode*> q;
+		q.push(root);
+		std::vector<std::vector<int>> layers;
+		while(!q.empty())
+		{
+			int n = q.size();
+			std::vector<int> layer;
+			while(n--)
+			{
+				auto node = q.front();
+				q.pop();
+				layer.emplace_back(node->val);
+				if(node->left)
+					q.push(node->left);
+				if(node->right)
+					q.push(node->right);
+			}
+			layers.emplace_back(std::move(layer));
+		}		
+		return layers.back().front();
+		}
 };
 ```
-
 
 # [538. 把二叉搜索树转换为累加树](https://leetcode-cn.com/problems/convert-bst-to-greater-tree/)
 
@@ -377,30 +364,55 @@ public:
 class Solution {
 public:
     TreeNode* convertBST(TreeNode* root) {
+		int sum = 0;
+		inorder(root,sum);
+		return root;
+    }
+	
+	void inorder(TreeNode*node,int& sum)  //@ 必须是引用
+	{
+		if(node == nullptr)
+			return;
+		inorder(node->right,sum);
+		sum += node->val;
+		node->val = sum;
+		inorder(node->left,sum);
+	}
+};
+```
+
+```
+class Solution {
+public:
+    TreeNode* convertBST(TreeNode* root) {
         if(root == nullptr)
             return nullptr;
-        
-        stack<TreeNode*> stk;
-        auto p = root;
-        int sum = 0;
-        while(true)
-        {
-            if(p)
-            {
-                stk.push(p);
-                p = p->right;
-            }
-            else if(!stk.empty())
-            {
-                p = stk.top();
-                stk.pop();
-                p->val += sum;
-                sum = p->val;
-                p = p->left;
-            }
-            else
-                break;
-        }
+		
+		std::stack<TreeNode*> s;
+		s.push(root);
+		int sum = 0;
+		while(!s.empty())
+		{
+			auto p = s.top();
+			if(p)
+			{
+				s.pop();
+				if(p->left)
+					s.push(p->left);		
+				s.push(p);
+				s.push(nullptr);				
+				if(p->right)
+					s.push(p->right);	
+			}
+			else
+			{
+				s.pop();
+				auto node = s.top();
+				s.pop();
+				sum += node->val;
+				node->val = sum;			
+			}
+		}
         return root;
     }
 };
