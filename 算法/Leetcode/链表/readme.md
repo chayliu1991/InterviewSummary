@@ -452,16 +452,18 @@ public:
 class Solution {
 public:
     bool hasCycle(ListNode *head) {
-        ListNode *fast = head,*slow = head;
+        if(head == nullptr || head->next == nullptr)
+            return false;
+        ListNode* slow = head,*fast = head->next->next;
         while(fast && fast->next)
         {
-            fast = fast->next->next;
-            slow = slow->next;
             if(fast == slow)
                 return true;
+            slow = slow->next;
+            fast = fast->next->next;
         }
         return false;
-    }
+    }8uh
 };
 ```
 

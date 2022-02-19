@@ -189,8 +189,10 @@ while (l2 != NULL && l2->next!= NULL) {
 - [2. 两数相加](https://leetcode-cn.com/problems/add-two-numbers/)
 - [86. 分隔链表](https://leetcode-cn.com/problems/partition-list/)
 - [328. 奇偶链表](https://leetcode-cn.com/problems/odd-even-linked-list/)
-
+- [19. 删除链表的倒数第 N 个结点](https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list/)
+- [142. 环形链表 II](https://leetcode-cn.com/problems/linked-list-cycle-ii/)
 - [206. 反转链表](https://leetcode-cn.com/problems/reverse-linked-list/)
+
 - [61. 旋转链表](https://leetcode-cn.com/problems/rotate-list/)
 - [21. 合并两个有序链表](https://leetcode-cn.com/problems/merge-two-sorted-lists/)
 - [203. 移除链表元素](https://leetcode-cn.com/problems/remove-linked-list-elements/)
