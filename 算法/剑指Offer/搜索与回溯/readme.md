@@ -44,19 +44,20 @@ public:
     bool isSubStructure(TreeNode* A, TreeNode* B) {
         if(A == nullptr || B == nullptr)
             return false;
-        return AhasB(A,B) || isSubStructure(A->left,B) || isSubStructure(A->right,B);
+        return substructure(A,B) || isSubStructure(A->left,B) || isSubStructure(A->right,B);
     }
 
-    bool AhasB(TreeNode* a,TreeNode* b)
+    bool substructure(TreeNode* A, TreeNode* B) 
     {
-        if(b == nullptr)
+        if(A == nullptr && B == nullptr)
             return true;
-        if(a == nullptr)
+        if(A == nullptr)
             return false;
-        if(a->val != b->val)
+        if(B == nullptr)
+            return true;
+        if(A->val != B->val)
             return false;
-        
-        return AhasB(a->left,b->left) && AhasB(a->right,b->right);
+        return substructure(A->left,B->left) && substructure(A->right,B->right);
     }
 };
 ```
@@ -439,51 +440,53 @@ public:
 ```
 class Codec {
 public:
+
     // Encodes a tree to a single string.
     string serialize(TreeNode* root) {
-        std::ostringstream out;
-		std::queue<TreeNode*> q;
-		q.push(root);
-		while(!q.empty())
-		{
-			auto node = q.front();
+        std::ostringstream os;
+        std::queue<TreeNode*> q;
+        q.push(root);
+        while(!q.empty())
+        {
+            auto curr = q.front();
             q.pop();
-			if(node != nullptr)
-			{				
-				out << node->val<<" ";
-				q.push(node->left);
-				q.push(node->right);
-			}
-			else
-				out <<"null ";		
-		}
-		return out.str();
+            if(curr)
+            {
+                os << curr->val << " ";
+                q.push(curr->left);
+                q.push(curr->right);
+            }
+            else
+            {
+                os << "null ";
+            }
+        }
+        return os.str();
     }
 
     // Decodes your encoded data to tree.
     TreeNode* deserialize(string data) {
-        std::istringstream inPut(data);
-		std::string val;
-		std::vector<TreeNode*> vec;
-		while(inPut >> val)
-		{
-			if(val == "null")
-				vec.push_back(nullptr);
-			else 
-				vec.push_back(new TreeNode(stoi(val)));
-		}
-
-		int j = 1;
-		for(int i = 0;j < vec.size();i++)
-		{
-			if(vec[i] == nullptr)
+        if(data.empty())
+            return nullptr;
+        std::istringstream is(data);
+        std::string s;
+        std::vector<TreeNode*> vec;
+        while(is >> s)
+        {
+            if(s == "null")
+                vec.emplace_back(nullptr);
+            else
+                vec.emplace_back(new TreeNode(std::stoi(s)));
+        }
+        int j = 1;
+        for(int i = 0;i < vec.size();i++)
+        {
+            if(vec[i] == nullptr)
 				continue;
-            if (j < vec.size()) 
-			    vec[i]->left = vec[j++];
-			if(j < vec.size())
-				vec[i]->right = vec[j++];
-		}
-		return vec.front();
+            vec[i]->left = vec[j++];
+            vec[i]->right = vec[j++];
+        }
+        return vec.front();
     }
 };
 ```
@@ -630,3 +633,4 @@ public:
     }
 };
 ```
+

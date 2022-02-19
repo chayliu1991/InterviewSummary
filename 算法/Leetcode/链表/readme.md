@@ -1,3 +1,114 @@
+# [203. 移除链表元素](https://leetcode-cn.com/problems/remove-linked-list-elements/)
+
+```
+class Solution {
+public:
+    ListNode* removeElements(ListNode* head, int val) {
+        ListNode dummy(-1);
+        dummy.next = head;
+        ListNode*prev = &dummy,*curr = head;
+        while(curr)
+        {
+            if(curr->val == val)
+                prev->next = curr->next;
+            else
+                prev = curr;
+            curr = curr->next;
+        }
+        return dummy.next;
+    }
+};
+```
+
+# [2. 两数相加](https://leetcode-cn.com/problems/add-two-numbers/)
+
+```
+class Solution {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        ListNode dummy(-1);
+        ListNode* curr = &dummy;
+        int carry = 0;
+        
+         for(ListNode *p1 =l1,*p2 = l2;p1 || p2;)
+        {
+            int v1 = (p1 == nullptr ? 0 : p1->val);
+            int v2 = (p2 == nullptr ? 0 : p2->val);
+            int sum = v1 + v2 + carry;
+            carry = sum/10;
+            ListNode* node = new ListNode(sum%10);
+            curr->next = node;
+            curr = curr->next;
+            p1 = (p1 == nullptr ? nullptr : p1->next);
+            p2 = (p2 == nullptr ? nullptr : p2->next);
+        }
+        
+        if(carry)
+        {
+            ListNode* node = new ListNode(carry);
+            curr->next = node;
+        }
+
+        return dummy.next;
+    }
+};
+```
+
+# [86. 分隔链表](https://leetcode-cn.com/problems/partition-list/)
+
+```
+class Solution {
+public:
+    ListNode* partition(ListNode* head, int x) {
+        ListNode node1(-1),node2(-1);
+        ListNode* hsmall = &node1,*hbig = &node2;
+        ListNode* curr_small = hsmall,*curr_big = hbig,*curr = head;
+        while(curr)
+        {
+            if(curr->val < x)
+            {
+				curr_small->next = curr;
+                curr_small = curr_small->next;
+            }
+            else
+            {
+                curr_big->next = curr;
+                curr_big = curr_big->next; 
+            }
+            curr = curr->next;
+        }
+        curr_big->next = nullptr;
+        curr_small->next = hbig->next;
+        return hsmall->next;
+    }
+};
+```
+
+# [328. 奇偶链表](https://leetcode-cn.com/problems/odd-even-linked-list/)
+
+```
+class Solution {
+public:
+    ListNode* oddEvenList(ListNode* head) {
+        if(head == nullptr || head->next == nullptr)
+            return head;
+
+        ListNode* odd = head;
+        ListNode* even_head = head->next;
+        ListNode* even = even_head;
+        while(even != nullptr && even->next != nullptr)
+        {
+            odd->next = even->next;
+            odd = odd->next;
+            even->next = odd->next;
+            even = even->next;
+        }
+        odd->next = even_head;
+        return head;
+    }
+};
+```
+
 # [206. 反转链表](https://leetcode-cn.com/problems/reverse-linked-list/)
 
 ```
@@ -40,28 +151,28 @@ public:
 ```
 class Solution {
 public:
-    ListNode* rotateRight(ListNode* head, int k) {     
-		if(head == nullptr || head->next == nullptr || k == 0)
-			return head;		
-		int len = 0;
-		for(ListNode* p = head;p;p=p->next)
-			len++;
-		k %= len;
-		if(k == 0)
-			return head;
-		
-		ListNode* fast = head,* slow = head;
-		while(k--)
-			fast = fast->next;
-		while(fast->next)
-		{
-			slow = slow->next;
-			fast = fast->next;
-		}
-		fast->next = head;
-		ListNode* res = slow->next;
-		slow->next = nullptr;
-		return res;
+    ListNode* rotateRight(ListNode* head, int k) {
+        if(head == nullptr || head->next == nullptr || k ==0)
+            return head;
+        int len = 1;
+        ListNode* curr = head;
+        while(curr->next)
+        {
+            len++;
+            curr = curr->next;
+        }
+        
+        if(k%len == 0)
+            return head;
+
+        curr->next = head;
+        int last = len - k%len;
+        while(last--)
+            curr = curr->next;
+        
+        ListNode* new_head = curr->next;
+        curr->next = nullptr;
+        return new_head;
     }
 };
 ```
@@ -214,35 +325,6 @@ public:
 };
 ```
 
-# [203. 移除链表元素](https://leetcode-cn.com/problems/remove-linked-list-elements/)
-
-```
-class Solution {
-public:
-    ListNode* removeElements(ListNode* head, int val) {
-        if(head == nullptr)
-            return head;
-
-        ListNode dummy(-1);
-        dummy.next = head;
-        ListNode* prev = &dummy,*curr = head;
-
-        while(curr)
-        {
-            if(curr->val == val)
-            {
-                prev->next = curr->next;
-                curr = prev->next;
-                continue;
-            }
-            prev = curr;
-            curr = curr->next;
-        }
-        return dummy.next;
-    }
-};
-```
-
 # [82. 删除排序链表中的重复元素 II](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-list-ii/)
 
 ```
@@ -324,38 +406,6 @@ public:
 };
 ```
 
-# [328. 奇偶链表](https://leetcode-cn.com/problems/odd-even-linked-list/)
-
-```
-class Solution {
-public:
-    ListNode* oddEvenList(ListNode* head) {
-        if(head == nullptr || head->next == nullptr)
-            return head;
-        
-        ListNode *odd_head = head,*odd_tail = head;
-        ListNode *even_head = head->next,*even_tail = even_head;
-        
-        for(ListNode* curr = head->next->next;curr != nullptr;)
-        {
-            odd_tail = odd_tail->next = curr;
-            curr = curr->next;
-
-            if(curr)
-            {
-                even_tail = even_tail->next = curr;
-                curr = curr->next;
-            }
-        }
-        odd_tail->next = even_head;
-        even_tail->next = nullptr;
-        return odd_head;
-    }
-};
-```
-
-
-
 # [148. 排序链表](https://leetcode-cn.com/problems/sort-list/)
 
 ```
@@ -393,36 +443,6 @@ public:
          curr->next = l1 ? l1 : l2;
          return dummy->next;
      }
-};
-```
-
-# [2. 两数相加](https://leetcode-cn.com/problems/add-two-numbers/)
-
-```
-class Solution {
-public:
-    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
-        ListNode dummy(-1);
-        ListNode* prev = &dummy;
-        int carry = 0;
-
-        for(ListNode *p1 =l1,*p2 = l2;p1 || p2;)
-        {
-            const int a = p1 == nullptr ? 0 : p1->val;
-            const int b = p2 == nullptr ? 0 : p2->val;
-            const int val = (a + b + carry) % 10;
-            carry = (a + b + carry) / 10;
-            prev->next = new ListNode(val);
-
-            p1 = (p1 == nullptr ? nullptr : p1->next);
-            p2 = (p2 == nullptr ? nullptr : p2->next);
-            prev = prev->next;
-        }
-
-        if(carry > 0)
-            prev->next = new ListNode(carry);
-        return dummy.next;
-    }
 };
 ```
 

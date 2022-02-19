@@ -6,7 +6,7 @@
 - 找左定右，找右定左，找右注意死循环
 - 旋转要看旋转点，若有重复需去重
 
-## 标准二分查找
+标准二分查找：
 
 ```
 int search(std::vector<int> nums,int target)
@@ -26,7 +26,7 @@ int search(std::vector<int> nums,int target)
 }
 ```
 
-## 寻找左边界
+寻找左边界：
 
 将区间 `[l, r]` 划分成 `[l, mid]` 和 `[mid + 1, r]` :
 
@@ -46,7 +46,7 @@ int search(std::vector<int> nums,int target)
 }
 ```
 
-## 寻找右边界
+寻找右边界：
 
 将区间 `[l, r]` 划分成 `[l, mid - 1]` 和 `[mid, r]` ：
 
@@ -128,7 +128,73 @@ int search(std::vector<int> nums,int target)
 - [889. 根据前序和后序遍历构造二叉树](https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-postorder-traversal/)
 - [37. 序列化二叉树](https://leetcode-cn.com/problems/xu-lie-hua-er-cha-shu-lcof/)
 
+# 链表
 
+遍历：
+
+```
+//@ 遍历链表
+ListNode* p = head;
+while(p!=NULL)
+    p = p->next;
+
+//@ 找到最后一个节点
+if(!head) return head;
+ListNode* p = head;
+while(p->next!=NULL){
+    p = p->next;
+}
+
+//@ 记录前一个
+ListNode* p_before = NULL;
+ListNode* p = head;
+while(p!=NULL){
+    p_before = p;
+    p = p->next;
+}
+
+//@ 在 head 之前加上一个节点来简化计算
+ListNode dummy(-1);
+dummy.next = head;
+```
+
+前后指针:
+
+```
+//@ l1在前，l2在后，让l2先走n步，当退出第二个循环时，l2位空，l1为倒数第n个节点
+ListNode* l1 = head;
+ListNode* l2 = head;
+while(n-->0){
+    l2 = l2->next;
+}
+while(l2 !=NULL){
+    l1 = l1->next;
+    l2 = l2->next;
+}
+
+//@ 利用快慢指针可以找到链表的中间节点，l1每次向前走一格，l2每次向前走两个
+ListNode* l1 = head;
+ListNode* l2 = head;
+while (l2 != NULL && l2->next!= NULL) {
+    l1 = l1->next;
+    l2 = l2->next->next;
+} 
+```
+
+
+
+
+
+- [203. 移除链表元素](https://leetcode-cn.com/problems/remove-linked-list-elements/)
+- [2. 两数相加](https://leetcode-cn.com/problems/add-two-numbers/)
+- [86. 分隔链表](https://leetcode-cn.com/problems/partition-list/)
+- [328. 奇偶链表](https://leetcode-cn.com/problems/odd-even-linked-list/)
+
+- [206. 反转链表](https://leetcode-cn.com/problems/reverse-linked-list/)
+- [61. 旋转链表](https://leetcode-cn.com/problems/rotate-list/)
+- [21. 合并两个有序链表](https://leetcode-cn.com/problems/merge-two-sorted-lists/)
+- [203. 移除链表元素](https://leetcode-cn.com/problems/remove-linked-list-elements/)
+- 
 
 
 
