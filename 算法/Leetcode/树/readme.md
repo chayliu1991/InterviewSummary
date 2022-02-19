@@ -235,10 +235,7 @@ public:
 			TreeNode* curr = s.top();
 			if(curr)
 			{
-				s.pop();
-				s.push(curr);
-				s.push(nullptr);
-				
+				s.push(nullptr);				
 				if(curr->right)
 					s.push(curr->right);				
 				if(curr->left)
@@ -1224,10 +1221,10 @@ public:
 class Solution {
 public:
     TreeNode* constructFromPrePost(vector<int>& preorder, vector<int>& postorder) {
-        return construct(preorder, postorder, 0, preorder.size() - 1, 0, postorder.size() - 1);
+        return build(preorder, postorder, 0, preorder.size()-1, 0, postorder.size()-1);
     }
 
-    TreeNode* construct(vector<int>& pre, vector<int>& post, int pre_start, int pre_end, int post_start, int post_end) 
+    TreeNode* build(vector<int>& pre, vector<int>& post, int pre_start, int pre_end, int post_start, int post_end) 
 	{
         if (pre_start > pre_end)
             return nullptr;
@@ -1241,8 +1238,8 @@ public:
             i++; 
         
         int len = i - post_start + 1;
-        root->left = construct(pre, post, pre_start + 1, pre_start + len, post_start, i);
-        root->right = construct(pre, post, pre_start + 1 + len, pre_end, i + 1, post_end - 1);
+        root->left = build(pre, post, pre_start + 1, pre_start + len, post_start, i);
+        root->right = build(pre, post, pre_start + 1 + len, pre_end, i + 1, post_end - 1);
         return root;
     }
 };
@@ -1253,33 +1250,25 @@ public:
 ````
 class Solution {
 public:
+	std::unordered_map<int,int> hash;
+	
     TreeNode* buildTree(vector<int>& inorder, vector<int>& postorder) {
-        int n = postorder.size();
-        if(n == 0)
-            return nullptr;
-        int val = postorder.back();
-        TreeNode* root = new TreeNode(val);
-        int L = 0;
-        for(int i=0;i < n;++i)
-        {
-            if(val == inorder[i])
-            {
-                L = i;
-                break;
-            }
-        }
-        //@ 中序遍历从起始开始,长度为L
-        vector<int> Lpre(inorder.begin(), inorder.begin()+L);
-        //@ 跳过中序遍历中的根节点位置
-        vector<int> Rpre(inorder.begin()+L+1, inorder.end());
-        //@ 后序遍历从起始开始,长度为L
-        vector<int> Lpost(postorder.begin(), postorder.begin()+L);    
-        //@ 后序遍历最后一个节点是根节点
-        vector<int> Rpost(postorder.begin()+L, postorder.end()-1);
-        root->left = buildTree(Lpre, Lpost);
-        root->right = buildTree(Rpre, Rpost);
-        return root;
+		for(int i = 0;i < inorder.size();i++)
+			hash[inorder[i]] = i;
+		return build(inorder,postorder,0,inorder.size()-1,0,postorder.size()-1);
     }
+	
+	TreeNode* build(vector<int>& inor, vector<int>& post,int inor_start,int inor_end,int post_start,int post_end)
+	{
+		if(inor_start > inor_end)
+			return nullptr;
+		TreeNode* root = new TreeNode(post[post_end]);
+		int pos = hash[post[post_end]];
+		int len = pos - inor_start -1;
+		root->left = build(inor,post,inor_start,pos-1,post_start,post_start+len);
+		root->right = build(inor,post,pos+1,inor_end,post_start+len+1,post_end-1);
+		return root;
+	}
 };
 ````
 
