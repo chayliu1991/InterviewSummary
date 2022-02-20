@@ -47,21 +47,21 @@ void quick_sort(std::vector<int>& nums, size_t left, size_t right)
 - 当遍历一轮时候，不发生交换，可以提前结束
 
 ```
-void bubble_sort(std::vector<int>& nums)
+void bubble_sort(std::vector<int>& array)
 {
-	bool exchange = false;
-	for (size_t i = nums.size() - 1; i > 0; --i)
+	int n = array.size();
+	for (int i = 0; i < n; i++)
 	{
-		for (size_t j = 0; j < i; ++j)
+		bool swapped = false;
+		for (int j = 0; j < n - 1; j++)
 		{
-			if (nums[j] >= nums[j + 1])
+			if (array[j] > array[j+1])
 			{
-				std::swap(nums[j], nums[j + 1]);
-				exchange = true;
+				std::swap(array[j],array[j+1]);
+				swapped = true;
 			}
 		}
-
-		if (!exchange)
+		if (!swapped)
 			break;
 	}
 }
