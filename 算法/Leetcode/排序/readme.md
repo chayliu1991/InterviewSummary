@@ -8,33 +8,32 @@
 - 然后再按此方法对这两部分数据分别进行快速排序，整个排序过程可以递归进行，以此达到整个数据变成有序序列
 
 ```
-size_t partition(std::vector<int>& nums, size_t left, size_t right)
+int partition(std::vector<int>& array, int left, int right)
 {
-	int key = nums[left];
+	int value = array[left];
 	while (left < right)
 	{
-		while (left < right && nums[right] >= key)
+		while (left < right && array[right] >= value)
 			right--;
 		if (left < right)
-			nums[left] = nums[right];
-		while (left < right && nums[left] <= key)
+			array[left] = array[right];
+
+		while(left < right && array[left] <= value)
 			left++;
 		if (left < right)
-			nums[right] = nums[left];
+			array[right] = array[left];
 	}
-	nums[left] = key;
+	array[left] = value;
 	return left;
 }
 
-void quick_sort(std::vector<int>& nums, size_t left, size_t right)
+void quick_sort(std::vector<int>& array,int left,int right)
 {
 	if (left >= right)
 		return;
-
-	size_t pivot = 0;
-	pivot = partition(nums, left, right);
-	quick_sort(nums, left, pivot - 1);
-	quick_sort(nums, pivot + 1, right);
+	int pos = partition(array,left,right);
+	quick_sort(array,left, pos-1);
+	quick_sort(array, pos+1,right);
 }
 ```
 
