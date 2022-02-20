@@ -30,7 +30,7 @@ public:
         ListNode* curr = &dummy;
         int carry = 0;
         
-         for(ListNode *p1 =l1,*p2 = l2;p1 || p2;)
+         for(ListNode *p1 =l1,*p2 = l2;p1 || p2 || carry;)
         {
             int v1 = (p1 == nullptr ? 0 : p1->val);
             int v2 = (p2 == nullptr ? 0 : p2->val);
@@ -42,14 +42,40 @@ public:
             p1 = (p1 == nullptr ? nullptr : p1->next);
             p2 = (p2 == nullptr ? nullptr : p2->next);
         }
-        
-        if(carry)
-        {
-            ListNode* node = new ListNode(carry);
-            curr->next = node;
-        }
-
         return dummy.next;
+    }
+};
+```
+
+# [445. 两数相加 II](https://leetcode-cn.com/problems/add-two-numbers-ii/)
+
+```
+class Solution {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        stack<int> s1, s2;
+        while (l1) {
+            s1.push(l1 -> val);
+            l1 = l1 -> next;
+        }
+        while (l2) {
+            s2.push(l2 -> val);
+            l2 = l2 -> next;
+        }
+        int carry = 0;
+        ListNode* res = nullptr;
+        while (!s1.empty() or !s2.empty() or carry != 0) {
+            int a = s1.empty() ? 0 : s1.top();
+            int b = s2.empty() ? 0 : s2.top();
+            if (!s1.empty()) s1.pop();
+            if (!s2.empty()) s2.pop();
+            int cur = a + b + carry;
+            carry = cur / 10;
+            auto curnode = new ListNode(cur % 10);
+            curnode -> next = res;
+            res = curnode;
+        }
+        return res;
     }
 };
 ```
@@ -517,7 +543,81 @@ public:
         }
     }
 };
+```
 
+# [147. 对链表进行插入排序](https://leetcode-cn.com/problems/insertion-sort-list/)
+
+```
+class Solution {
+public:
+    ListNode* insertionSortList(ListNode* head) {
+        if (head == nullptr || head->next == nullptr)
+            return head;
+        
+        ListNode* dummy = new ListNode(-1,head);
+        ListNode* last_sorted = head;
+        ListNode* curr = head->next;
+        
+        while (curr != nullptr) {
+            if (last_sorted->val <= curr->val)
+                last_sorted = last_sorted->next; //@ 如果顺序排列，插入到最后一个位置
+            else 
+            {
+                ListNode* prev = dummy;    //@ 否则将 curr 节点插入到 list 的前面部分                
+                while (prev->next->val <= curr->val)
+                    prev = prev->next;
+                
+                //@ 此时 prev 指向的 node 是小于 curr 的最大值 
+                last_sorted->next = curr->next;  //@ 首先记录 curr->next 的值
+                curr->next = prev->next;        //@ 将 curr 插入到 prev 和 prev->next 之间
+                prev->next = curr;              
+            }  
+            curr = last_sorted->next;
+            //@ 向后移动考察值
+        }
+        
+        return dummy->next; 
+    }
+};
+```
+
+# [148. 排序链表](https://leetcode-cn.com/problems/sort-list/)
+
+```
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) 
+    {
+        if (nullptr == head || nullptr == head->next) 
+            return head;
+        auto slow = head, fast = head;
+        while (fast->next && fast->next->next)
+        {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+             
+        //@ 切链
+        fast = slow->next;
+        slow->next = nullptr;
+        return merge(sortList(head), sortList(fast));
+    }
+
+private:
+    ListNode* merge(ListNode* l1, ListNode* l2) 
+    {
+        ListNode *dummy = new ListNode(-1);
+        ListNode *curr = dummy;
+        while (l1 && l2) {
+            auto &node = l1->val < l2->val ? l1 : l2;
+            curr->next = node;
+            curr = curr->next;
+            node = node->next;
+        }
+        curr->next = l1 ? l1 : l2;
+        return dummy->next;
+    }
+};
 ```
 
 
