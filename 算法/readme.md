@@ -154,8 +154,7 @@ while(p!=NULL){
 }
 
 //@ 在 head 之前加上一个节点来简化计算
-ListNode dummy(-1);
-dummy.next = head;
+ ListNode* dummy = new ListNode(-1,head);
 ```
 
 前后指针:
@@ -181,22 +180,23 @@ while (l2 != NULL && l2->next!= NULL) {
 } 
 ```
 
-
-
-
-
 - [203. 移除链表元素](https://leetcode-cn.com/problems/remove-linked-list-elements/)
 - [2. 两数相加](https://leetcode-cn.com/problems/add-two-numbers/)
 - [86. 分隔链表](https://leetcode-cn.com/problems/partition-list/)
 - [328. 奇偶链表](https://leetcode-cn.com/problems/odd-even-linked-list/)
-- [19. 删除链表的倒数第 N 个结点](https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list/)
-- [142. 环形链表 II](https://leetcode-cn.com/problems/linked-list-cycle-ii/)
-- [206. 反转链表](https://leetcode-cn.com/problems/reverse-linked-list/)
-
-- [61. 旋转链表](https://leetcode-cn.com/problems/rotate-list/)
 - [21. 合并两个有序链表](https://leetcode-cn.com/problems/merge-two-sorted-lists/)
+- [19. 删除链表的倒数第 N 个结点](https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list/)
 - [203. 移除链表元素](https://leetcode-cn.com/problems/remove-linked-list-elements/)
-- 
+- [142. 环形链表 II](https://leetcode-cn.com/problems/linked-list-cycle-ii/)
+- [160. 相交链表](https://leetcode-cn.com/problems/intersection-of-two-linked-lists/)
+- [24. 两两交换链表中的节点](https://leetcode-cn.com/problems/swap-nodes-in-pairs/)
+- [82. 删除排序链表中的重复元素 II](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-list-ii/)
+- [83. 删除排序链表中的重复元素](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-list/)
+- [61. 旋转链表](https://leetcode-cn.com/problems/rotate-list/)
+- [206. 反转链表](https://leetcode-cn.com/problems/reverse-linked-list/)
+- [146. LRU 缓存机制](https://leetcode-cn.com/problems/lru-cache/)
+
+
 
 
 

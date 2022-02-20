@@ -211,26 +211,13 @@ public:
 class Solution {
 public:
     ListNode* swapPairs(ListNode* head) {
-        if(head == nullptr || head->next == nullptr)
+        if (head == nullptr || head->next == nullptr) {
             return head;
-        
-        ListNode dummy(-1);
-        dummy.next = head;
-        ListNode* prev = &dummy,*curr = head;
-        ListNode* left = &dummy,*right = head;
-        while(curr && curr->next)
-        {
-            left = curr->next;
-            right = curr->next->next;
-
-            curr->next->next = curr;
-            curr->next = right;
-            prev->next = left;
-
-            prev = curr;
-            curr = right;
         }
-        return dummy.next;
+        ListNode* new_head = head->next;
+        head->next = swapPairs(new_head->next);
+        new_head->next = head;
+        return new_head;
     }
 };
 ```
@@ -333,23 +320,20 @@ public:
     ListNode* deleteDuplicates(ListNode* head) {
         if(head == nullptr || head->next == nullptr)
             return head;
-        
-        ListNode dummy(-1);
-        dummy.next = head;
-        ListNode* prev = &dummy;
-        while(prev && prev->next)
+        ListNode* dummy = new ListNode(-1,head);
+        ListNode* curr = dummy;
+        while(curr->next && curr->next->next)
         {
-            ListNode* curr = prev->next;
-            if(curr->next == nullptr || curr->val != curr->next->val)
-                prev = curr;
-            else
+            if(curr->next->val == curr->next->next->val)
             {
-                while(curr->next && curr->val == curr->next->val)
-                    curr = curr->next;
-                prev->next = curr->next;
+                int x = curr->next->val;
+                while(curr->next && curr->next->val == x)
+                  curr->next = curr->next->next;
             }
+            else
+                curr = curr->next;
         }
-        return dummy.next;
+        return dummy->next;
     }
 };
 ```
@@ -360,13 +344,13 @@ public:
 class Solution {
 public:
     ListNode* deleteDuplicates(ListNode* head) {
-        if(head == nullptr || head->next == nullptr)
+        if (head == nullptr || head->next == nullptr) 
             return head;
-        
+
         ListNode* curr = head;
-        while(curr->next)
+        while (curr->next) 
         {
-            if(curr->val == curr->next->val)
+            if (curr->val == curr->next->val)
                 curr->next = curr->next->next;
             else
                 curr = curr->next;
@@ -454,16 +438,17 @@ public:
     bool hasCycle(ListNode *head) {
         if(head == nullptr || head->next == nullptr)
             return false;
-        ListNode* slow = head,*fast = head->next->next;
+        ListNode* slow = head,*fast = head;
         while(fast && fast->next)
         {
+            fast = fast->next->next;
+            slow = slow->next;
+
             if(fast == slow)
                 return true;
-            slow = slow->next;
-            fast = fast->next->next;
         }
         return false;
-    }8uh
+    }
 };
 ```
 
@@ -473,25 +458,26 @@ public:
 class Solution {
 public:
     ListNode *detectCycle(ListNode *head) {
-        ListNode *fast = head,*slow = head;
+        if(head == nullptr || head->next == nullptr)
+            return nullptr;
+        ListNode*fast = head,* slow = head;
         while(fast && fast->next)
         {
             fast = fast->next->next;
             slow = slow->next;
-
-            //@ 链表有环
             if(fast == slow)
             {
                 fast = head;
                 while(fast != slow)
                 {
-                    slow = slow->next;
                     fast = fast->next;
+                    slow = slow->next;
                 }
                 return fast;
             }
+
         }
-        return nullptr;        
+        return nullptr;
     }
 };
 ```
@@ -500,39 +486,38 @@ public:
 
 ```
 class LRUCache {
-	int cap_;
-    list<pair<int, int>> record_;  //@ pair<key,value>
-	using Iter = list<pair<int,int>>::iterator;	
-    unordered_map<int, Iter> dict_;   
-	
 public:
-    LRUCache(int capacity):cap_(capacity) {
+    int cap_{0};
+    std::list<std::pair<int,int>>  reords_;
+    using Iter = std::list<std::pair<int,int>>::iterator;
+    std::unordered_map<int,Iter> hash_;
+
+    LRUCache(int capacity) : cap_(capacity){
     }
     
     int get(int key) {
-		if(dict_.find(key) == dict_.end())
-			return -1;
-		int res = dict_[key]->second;
-		record_.erase(dict_[key]);
-		record_.push_front({key,res});
-		dict_[key] = record_.begin();
-		return res;
+        if(hash_.find(key) == hash_.end())
+            return -1;
+        int res = hash_[key]->second;
+        reords_.erase(hash_[key]);
+        reords_.push_front({key,res});
+        hash_[key] = reords_.begin();
+        return res;
     }
     
     void put(int key, int value) {
-		if(dict_.find(key) != dict_.end())		
-			record_.erase(dict_[key]);
-		
-		record_.push_front({key,value});
-		dict_[key] = record_.begin();
-		
-		if(record_.size() > cap_)
-		{	
-			dict_.erase(record_.back().first);
-			record_.pop_back();
-		}	
+        if(hash_.find(key) != hash_.end())
+            reords_.erase(hash_[key]);
+        reords_.push_front({key,value});
+        hash_[key] = reords_.begin();
+        if(reords_.size() > cap_)
+        {
+            hash_.erase(reords_.back().first);
+            reords_.pop_back();
+        }
     }
 };
+
 ```
 
 
