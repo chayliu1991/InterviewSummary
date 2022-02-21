@@ -4,20 +4,24 @@
 class Solution {
 public:
     bool exist(vector<vector<char>>& board, string word) {
-        if(word.empty() || board.empty() || board[0].empty()) 
+        if(board.empty() || board[0].empty() || word.empty())
             return false;
-        for(int i=0; i<board.size(); ++i)
+     
+        for(int i = 0;i < board.size();i++)
         {
-            for(int j=0; j<board[0].size(); ++j)
+            for(int j = 0;j < board[0].size();j++)
             {
-                if(dfs(board, word, i, j, 0)) 
-					return true;
+                if(board[i][j] == word[0])
+                {
+                    if(dfs(board,word,i,j,0))
+                        return true;   
+                }      
             }
         }
         return false;
     }
-	
-    bool dfs(vector<vector<char>>& board, string& word, int i, int j, int curr)
+
+     bool dfs(vector<vector<char>>& board, string& word, int i, int j, int curr)
     {
         if(i < 0 || i >= board.size() || j < 0 || j >= board[0].size() || board[i][j] != word[curr]) 
 			return false;
@@ -25,8 +29,13 @@ public:
 			return true;
         char temp = board[i][j]; 
         board[i][j] = '\0';
-        if(dfs(board,word,i-1,j,curr+1) || dfs(board,word,i+1,j,curr+1) || dfs(board,word,i,j-1,curr+1) || dfs(board,word,i,j+1,curr+1))
-            return true;
+        int dx[] = {1,0,-1,0},dy[] = {0,1,0,-1};
+       	for(int k = 0;k < 4;k++)
+		{
+			int x = dx[k] + i,y = dy[k] + j;
+			if(dfs(board,word,x,y,curr+1))
+				return true;
+		}
 
 		board[i][j] = temp; 
         return false;

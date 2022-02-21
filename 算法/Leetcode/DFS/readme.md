@@ -188,37 +188,38 @@ public:
 
 ```
 class Solution {
+    int dfs(vector<vector<int>>& grid,int i,int j)
+    {
+        if(i < 0 || i >= grid.size() || j < 0 || j >= grid[0].size() || grid[i][j] == 0)
+            return 1;
+
+        if(grid[i][j] == INT_MAX)
+            return 0;
+        grid[i][j] = INT_MAX;
+        int count = 0;
+        int dx[] = {1,0,-1,0} ,dy[] = {0,1,0,-1};
+        for(int k = 0;k < 4;k++)
+        {
+            int x = dx[k] + i,y = dy[k] + j;
+            count += dfs(grid,x,y);
+        }
+        return count;
+    }
+
 public:
-	int dfs(vector<vector<int>>& grid,int i,int j)
-	{
-		//@ 从陆地到海洋或者从陆地到边界，周长+1
-		if(i < 0 || j <0 || i >= grid.size() || j >= grid[0].size() || grid[i][j] == 0)
-			return 1;
-		if (grid[i][j] == 2)
-			return 0;
-		grid[i][j] = 2; //@ 标记为已读
-		int res = 0;
-		
-		vector<vector<int>> dir{{0,1},{0,-1},{1,0},{-1,0}};
-		for(const auto d :dir)
-			res += dfs(grid,i+d[0],j+d[1]);
-		return res;
-	}
-	
     int islandPerimeter(vector<vector<int>>& grid) {
-		if(grid.empty())
-			return 0;
-		
-		int res  = 0;
-		for(int i = 0;i < grid.size();i++)
-		{
-			for(int j = 0;j < grid[0].size();j++)
-			{
-				if(grid[i][j] == 1)
-					res += dfs(grid,i,j);
-			}
-		}
-		return res;
+        if(grid.empty())
+            return 0;
+        int res = 0;
+        for(int i = 0;i < grid.size();i++)
+        {
+            for(int j = 0;j < grid[0].size();j++)
+            {
+                if(grid[i][j] == 1)
+                    res += dfs(grid,i,j);
+            }
+        }
+        return res;
     }
 };
 ```
@@ -232,46 +233,20 @@ public:
         if(n <= 0)
             return {};
         
-        vector<string>  res;
+        std::vector<string> res;
         dfs(res,"",n,0,0);
         return res;
     }
 
-    void dfs(vector<string>& res,string path,int n,int lc,int rc) 
+    void dfs(vector<string>& res,string path,int n,int lp,int rp) 
     {
-        if(rc > lc || rc > n || lc > n)
+        //@ dfs 的条件是右括号数量不能大于左括号，左、右括号的长度都不能大于n
+        if(rp > lp || rp > n || lp > n)
             return;
-        if(rc == lc && lc == n)
-            res.push_back(path);
-        dfs(res,path+'(',n,lc+1,rc);
-        dfs(res,path+')',n,lc,rc+1);
-    }
-};
-```
-
-# [22. 括号生成](https://leetcode-cn.com/problems/generate-parentheses/)
-
-```
-class Solution {
-public:
-    vector<string> generateParenthesis(int n) {
-        if(n <= 0)
-            return {};
-        
-        vector<string>  res;
-        dfs(res,"",n,0,0);
-        return res;
-    }
-
-    void dfs(vector<string>& res,string path,int n,int lc,int rc) 
-    {
-        //@ dfs 的条件是有括号数量不能大于左括号，左、右括号的长度都不能大于n
-        if(rc > lc || rc > n || lc > n)
-            return;
-        if(rc == lc && lc == n)
-            res.push_back(path);
-        dfs(res,path+'(',n,lc+1,rc);
-        dfs(res,path+')',n,lc,rc+1);
+        if(rp == lp && lp == n)
+            res.emplace_back(path);
+        dfs(res,path+'(',n,lp+1,rp);
+        dfs(res,path+')',n,lp,rp+1);
     }
 };
 ```
