@@ -140,28 +140,27 @@ public:
 ```
 class Solution {
 public:
-    vector<vector<int>> updateMatrix(vector<vector<int>>& matrix) {
-        if(matrix.empty() || matrix[0].empty())
-            return {};
-        
-        constexpr int dx[4] = {1,0,-1,0};
-        constexpr int dy[4] = {0,1,0,-1};
-        int m = matrix.size(),n = matrix[0].size();
-        vector<vector<int>> res(m,vector<int>(n,0)),visited(m,vector<int>(n,0));
+    vector<vector<int>> updateMatrix(vector<vector<int>>& mat) {
+		if(mat.empty())
+			return {};
+		int dx[] = {0,1,-1,0},dy[] = {1,0,0,-1};
+		int rows = mat.size(),cols = mat[0].size();
+		std::vector<std::vector<bool>> visited(rows,std::vector<bool>(cols));
+		std::vector<std::vector<int>> res(rows,std::vector<int>(cols)); 	
         queue<pair<int,int>> q;
-        for(int i = 0;i < m;i++)
-        {
-            for(int j = 0;j < n;j++)
-            {
-                if(matrix[i][j] == 0)
-                {
-                    q.emplace(i,j);
-                    visited[i][j] = 1;
-                }
-            }
-        }
-
-        while(!q.empty())
+		for(int i = 0;i < rows;i++)
+		{
+			for(int j = 0;j < cols;j++)
+			{
+				if(mat[i][j] == 0)
+				{
+					q.emplace(i,j);
+					visited[i][j] = true;
+				}
+			}
+		}
+		
+		while(!q.empty())
         {
             auto it= q.front();
             q.pop();
@@ -170,11 +169,11 @@ public:
             {
                 int x = row + dx[k];
                 int y = col + dy[k];
-                if(x >= 0 && x < m && y >= 0 && y < n && !visited[x][y])
+                if(x >= 0 && x < rows && y >= 0 && y < cols && !visited[x][y])
                 {
                     res[x][y] = res[row][col] + 1;
                     q.emplace(x,y);
-                    visited[x][y] = 1;
+                    visited[x][y] = true;
                 }
             }
         }

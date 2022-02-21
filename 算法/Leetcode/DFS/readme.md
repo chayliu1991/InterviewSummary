@@ -30,35 +30,34 @@
 ```
 class Solution {
 public:
-    unordered_map<char,string> dict = {
-        {'2', "abc"}, {'3', "def"}, {'4', "ghi"}, {'5', "jkl"}, {'6', "mno"},
-        {'7', "pqrs"}, {'8', "tuv"}, {'9', "wxyz"}};
-
-    vector<string> res;
-    string tmp;
-
-    void dfs(int index,string digits)
-    {
-        if(index == digits.size())
-        {
-            res.push_back(tmp);
-            return;
-        }
-        
-        for(int i = 0;i < dict[digits[index]].size();i++)
-        {
-            tmp.push_back(dict[digits[index]][i]);
-            dfs(index+1,digits);
-            tmp.pop_back();
-        }
-    }
-
     vector<string> letterCombinations(string digits) {
-        if(digits.empty())
-            return {};
-        dfs(0,digits);
+		if(digits.empty())
+			return {};
+		std::string path;
+		std::vector<std::string> res;
+		dfs(digits,path,res,0);	
         return res;
     }
+	
+	void dfs(const std::string& digits,std::string& path,std::vector<std::string>& res,int index)
+	{
+		std::unordered_map<char,string> dict = {
+        {'2', "abc"}, {'3', "def"}, {'4', "ghi"}, {'5', "jkl"}, {'6', "mno"},
+        {'7', "pqrs"}, {'8', "tuv"}, {'9', "wxyz"}};
+	
+		if(index == digits.size())
+		{
+			res.push_back(path);
+			return;
+		}
+		
+		for(int i = 0;i < dict[digits[index]].size();i++)
+        {
+            path.push_back(dict[digits[index]][i]);
+            dfs(digits,path,res,index+1);
+            path.pop_back();
+        }
+	}	
 };
 ```
 

@@ -242,8 +242,16 @@ while (l2 != NULL && l2->next!= NULL) {
 
 
 - [41. 数据流中的中位数](https://leetcode-cn.com/problems/shu-ju-liu-zhong-de-zhong-wei-shu-lcof/)
-- ​
 
 
+# BFS
 
+BFS 的整个解决分成下边几个步骤：
+
+- 起点入队列
+- 以队列非空为循环条件，进行节点扩散（将所有队列节点出队（同时判断出队节点是否为目标节点），获取其邻接结点）
+- 判断获取的节点是否已被遍历，未被遍历节点入队
+
+- [200. 岛屿数量](https://leetcode-cn.com/problems/number-of-islands/)
+- [542. 01 矩阵](https://leetcode-cn.com/problems/01-matrix/)
 
