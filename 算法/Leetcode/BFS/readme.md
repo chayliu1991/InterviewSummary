@@ -45,42 +45,43 @@ int BFS(start,target){
 class Solution {
 public:
     int numIslands(vector<vector<char>>& grid) {
-        if(grid.empty())
-            return 0;
-		
-		vector<vector<int>> dir{{-1,0},{1,0},{0,1},{0,-1}};    
-        int res = 0;
-
-        for(int i = 0;i < grid.size();i++)
-        {
-            for(int j = 0;j < grid[0].size();j++)
-            {
-                if(grid[i][j] == '1')
-                {
-                    grid[i][j] = '0';
-                    queue<pair<int,int>> q;
-                    q.push({i,j});
-                    res++;
-                    while(!q.empty())
-                    {
-                        auto front = q.front();
-                        q.pop();
-                        int row = front.first,col = front.second;
-						for(const auto d : dir)
+		if(grid.empty())
+			return 0;
+		int res = 0;
+		int dx[] = {0,1,-1,0},dy[] = {1,0,0,-1};
+		int rows = grid.size(),cols = grid[0].size();
+		std::vector<std::vector<bool>> visited(rows,std::vector<bool>(cols));
+		for(int i = 0;i < rows;i++)
+		{
+			for(int j = 0;j < cols;j++)
+			{
+				if(grid[i][j] == '1' && !visited[i][j])
+				{
+					visited[i][j] = true;
+					std::queue<std::pair<int,int>> q;
+					q.push({i,j});
+					res += 1;
+					
+					while(!q.empty())
+					{
+						auto land = q.front();
+						q.pop();
+						int x = land.first,y = land.second;
+						for(int i = 0; i < 4;i++)
 						{
-							int x = row + d[0];
-							int y = col + d[1];
-							if(x >=0 && x <  grid.size() && y >=0 && y < grid[0].size() && grid[x][y] == '1')
+							int m = x + dx[i],n = y + dy[i];
+							if(m >=0 && m < rows && n >= 0 && n < cols && grid[m][n] == '1' && !visited[m][n])
 							{
-								q.push({x,y});
-								grid[x][y] = '0';
+								visited[m][n] = true;
+								q.push({m,n});
 							}
 						}
-                    }
-                }             
-            }
-        }
-        return res;
+						
+					}
+				}
+			}
+		}
+		return res;
     }
 };
 ````
