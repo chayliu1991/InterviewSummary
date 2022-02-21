@@ -214,13 +214,29 @@ while (l2 != NULL && l2->next!= NULL) {
 
 - [147. 对链表进行插入排序](https://leetcode-cn.com/problems/insertion-sort-list/)
 
--  [148. 排序链表](https://leetcode-cn.com/problems/sort-list/)
+- [148. 排序链表](https://leetcode-cn.com/problems/sort-list/)
 
 - [23. 合并K个升序链表](https://leetcode-cn.com/problems/merge-k-sorted-lists/)
 
 # 排序
 
+时间复杂度和稳定性：
 
+| 排序算法 | 平均时间复杂度  | 稳定性  |   备注   |
+| :--: | :------: | :--: | :----: |
+| 插入排序 |  O(n^2)  |  稳定  | n 小时较好 |
+| 希尔排序 | O(n^1.3) | 不稳定  | n 大时较好 |
+| 选择排序 |  O(n^2)  | 不稳定  | n 小时较好 |
+| 堆排序  | O(nlogn) | 不稳定  | n 大时较好 |
+| 冒泡排序 |  O(n^2)  |  稳定  | n 小时较好 |
+| 快速排序 | O(nlogn) | 不稳定  | n 大时较好 |
+| 归并排序 | O(nlogn) |  稳定  | n 大时较好 |
+
+直接插入排序和希尔排序的比较：
+
+- 直接插入排序是稳定的；而希尔排序是不稳定的
+- 直接插入排序更适合于原始记录基本有序的集合。希尔排序的比较次数和移动次数都要比直接插入排序少，当N越大时，效果越明显
+- 直接插入排序也适用于链式存储结构；希尔排序不适用于链式结构
 
 
 

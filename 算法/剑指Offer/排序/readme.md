@@ -26,24 +26,24 @@ public:
     }
     
     void addNum(int num) {
-        max_q.push(num);
-        min_q.push(max_q.top());
-        max_q.pop();
+        decrease_max.push(num);
+        increase_min.push(decrease_max.top());
+        decrease_max.pop();
 
-        while(max_q.size() < min_q.size())
+        while(decrease_max.size() < increase_min.size())
         {
-            max_q.push(min_q.top());
-            min_q.pop();
+            decrease_max.push(increase_min.top());
+            increase_min.pop();
         }
     }
     
     double findMedian() {
-        return max_q.size() > min_q.size() ? (double) max_q.top() : (max_q.top() + min_q.top()) * 0.5;
+        return decrease_max.size() > increase_min.size() ? (double) decrease_max.top() : (decrease_max.top() + increase_min.top()) * 0.5;
     }
 
 private:
-    std::priority_queue<int,std::vector<int>,std::greater<int>> min_q;
-    std::priority_queue<int,std::vector<int>,std::less<int>> max_q;
+    std::priority_queue<int,std::vector<int>,std::greater<int>> increase_min;
+    std::priority_queue<int,std::vector<int>,std::less<int>> decrease_max;
 };
 ```
 

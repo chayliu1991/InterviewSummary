@@ -37,6 +37,45 @@ void quick_sort(std::vector<int>& array,int left,int right)
 }
 ```
 
+## 归并排序
+
+![](./img/merge_sort.gif)
+
+归并排序是建立在归并操作上的一种有效的排序算法，该算法是采用分治法的一个非常典型的应用。
+
+```
+void merge(std::vector<int>& nums, size_t left, size_t mid, size_t right)
+{
+	size_t i = left, j = mid + 1, k = 0;
+	std::vector<int> vec(right - left + 1);
+
+	while (i <= mid && j <= right)
+	{
+		if (nums[i] <= nums[j])
+			vec[k++] = nums[i++];
+		else
+			vec[k++] = nums[j++];
+	}
+
+	while (i <= mid)
+		vec[k++] = nums[i++];
+	while (j <= right)
+		vec[k++] = nums[j++];
+	for (i = left, k = 0; i <= right;)
+		nums[i++] = vec[k++];
+}
+
+void merge_sort(std::vector<int>& nums, size_t left, size_t right)
+{
+	if (left >= right)
+		return;
+
+	size_t mid = left + ((right - left) >> 1);
+	merge_sort(nums, left, mid);
+	merge_sort(nums, mid + 1, right);
+	merge(nums, left, mid, right);
+}
+```
 ## 冒泡排序
 
 ![](./img/bubble_sort.gif)
@@ -94,58 +133,21 @@ void select_sort(std::vector<int>& nums)
 ![](./img/insert_sort.gif)
 
 ```
-void insert_sort(std::vector<int>& nums)
+void insert_sort(std::vector<int>& array)
 {
-	for (size_t i = 1; i < nums.size(); i++)
-	{
-		size_t j = i;
-		while (j > 0 && nums[j] < nums[j - 1])
-		{
-			std::swap(nums[j], nums[j - 1]);
-			j--;
-		}
-	}
-}
-```
-
-## 归并排序
-
-![](./img/merge_sort.gif)
-
-归并排序是建立在归并操作上的一种有效的排序算法，该算法是采用分治法的一个非常典型的应用。
-
-```
-void merge(std::vector<int>& nums, size_t left, size_t mid, size_t right)
-{
-	size_t i = left, j = mid + 1, k = 0;
-	std::vector<int> vec(right - left + 1);
-
-	while (i <= mid && j <= right)
-	{
-		if (nums[i] <= nums[j])
-			vec[k++] = nums[i++];
-		else
-			vec[k++] = nums[j++];
-	}
-
-	while (i <= mid)
-		vec[k++] = nums[i++];
-	while (j <= right)
-		vec[k++] = nums[j++];
-	for (i = left, k = 0; i <= right;)
-		nums[i++] = vec[k++];
+  int n = array.size();
+  for (int i = 1; i < n; i++)
+  {
+    int j = i - 1;
+    int key = array[i];
+    while (j >= 0 && array[j] > key) {
+      array[j + 1] = array[j];
+      j--;
+    }
+    array[j + 1] = key;
+  }
 }
 
-void merge_sort(std::vector<int>& nums, size_t left, size_t right)
-{
-	if (left >= right)
-		return;
-
-	size_t mid = left + ((right - left) >> 1);
-	merge_sort(nums, left, mid);
-	merge_sort(nums, mid + 1, right);
-	merge(nums, left, mid, right);
-}
 ```
 
 ## 希尔排序
@@ -155,28 +157,26 @@ void merge_sort(std::vector<int>& nums, size_t left, size_t right)
 希尔(Shell)排序又称为缩小增量排序，它是一种插入排序。
 
 ```
-void shell_sort(std::vector<int>& nums)
+void shell_sort(std::vector<int>& array)
 {
-	for (size_t step = nums.size() >> 1; step > 0; step >>= 1)
-	{
-		for (size_t i = 0; i < step; ++i)
-		{
-			for (size_t j = i + step; j < nums.size(); j += step)
-			{
-				if (nums[j] < nums[j - step])
-				{
-					int tmp = nums[j];
-					int k = j - step;
-					while (k >= 0 && tmp < nums[k])
-					{
-						nums[k + step] = nums[k];
-						k -= step;
-					}
-					nums[k + step] = tmp;
-				}
-			}
-		}
-	}
+  int len = array.size();
+  for (int step = len / 2; step >= 1; step /= 2)
+  {
+    for (int i = 0; i < step; i++)
+    {
+      for (int j = step + i; j < len; j += step)
+      {
+        int key = array[j];
+        int index = j - step;
+        while (index >= 0 && array[index] > key)
+        {
+          array[index + step] = array[index];
+          index -= step;
+        }
+        array[index + step] = key;
+      }
+    }
+  }
 }
 ```
 
@@ -277,34 +277,29 @@ void radix_sort(std::vector<int>& nums)
 # [147. 对链表进行插入排序](https://leetcode-cn.com/problems/insertion-sort-list/)
 
 ```
+
 class Solution {
 public:
-    ListNode* insertionSortList(ListNode* head) {
-        if(head == nullptr || head->next == nullptr)
-            return head;
-        ListNode dummy(-1);
-        dummy.next = head;
-        ListNode* curr = head->next,*prev = head;
-        while(curr)
-        {
-            if(curr->val < prev->val)
-            {
-                ListNode* tmp = &dummy;
-                while(tmp->next->val <= curr->val)
-                    tmp = tmp->next;
-                
-                prev->next = curr->next;
-                curr->next = tmp->next;
-                tmp->next = curr;
-                curr = prev->next;
-            }
-            else
-            {
-                curr = curr->next;
-                prev = prev->next;
-            }
-        }
-        return dummy.next;
+    ListNode* sortList(ListNode* head) {
+		if(head == nullptr || head->next == nullptr)
+			return head;
+		ListNode* dummy = new ListNode(-1,head);
+		ListNode* last_sorted = head,* curr = head->next;
+		while(curr)
+		{
+			if(last_sorted->val <= curr->val)
+				last_sorted = last_sorted->next;
+			else{
+				ListNode* prev = dummy;
+				while(prev->next->val <= curr->val)
+					prev = prev->next;
+				last_sorted->next = curr->next;
+				curr->next = prev->next;
+				prev->next = curr;
+			}
+			curr = last_sorted->next;
+		}
+		return dummy->next;
     }
 };
 ```
