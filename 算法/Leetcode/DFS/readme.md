@@ -88,9 +88,12 @@ public:
 
         grid[i][j] = 0;
         int count = 1;
-        vector<vector<int>> dir{{1,0},{-1,0},{0,1},{0,-1}};
-        for(const auto d : dir)
-            count += dfs(grid,i+d[0],j+d[1]);
+		int dx[] = {1,0,-1,0} ,dy[] = {0,1,0,-1};
+        for(int k = 0;k < 4;k++)
+		{
+			int x = dx[k] + i,y = dy[k] + j;
+			count += dfs(grid,x,y);
+		}
         return count;
     }
 };
@@ -100,34 +103,37 @@ public:
 
 ```
 class Solution {
-public:
-    int numIslands(vector<vector<char>>& grid) {
-        if(grid.empty())
-            return 0;
-        int res  = 0;
-        for(int i = 0;i < grid.size();i++)
-        {
-            for(int j = 0;j < grid[0].size();j++)
-            {
-                if(grid[i][j] == '1')
-                {
-                    res++;
-                    dfs(grid,i,j);
-                }
-            }
-        }
-        return res;
-    }
-
     void dfs(vector<vector<char>>& grid,int i,int j)
     {
         if(i < 0 || j < 0 || i >= grid.size() || j >= grid[0].size() || grid[i][j] == '0')
             return;
         grid[i][j] = '0';
+        int dx[] = {1,0,-1,0} ,dy[] = {0,1,0,-1};
+        for(int k = 0;k < 4;k++)
+        {
+            int x = dx[k] + i,y = dy[k] + j;
+            dfs(grid,x,y);
+        }
+    }
 
-        vector<vector<int>> dir{{1,0},{-1,0},{0,1},{0,-1}};
-        for(const auto d : dir)
-            dfs(grid,i+d[0],j+d[1]);
+public:
+    int numIslands(vector<vector<char>>& grid) {
+        if(grid.empty() || grid[0].empty())
+            return 0;
+        int rows = grid.size(),cols = grid[0].size();
+        int res = 0;
+        for(int i = 0;i < rows;i++)
+        {
+            for(int j = 0;j < cols;j++)
+            {
+                if(grid[i][j] == '1')
+                {
+                    res += 1;
+                    dfs(grid,i,j);
+                }
+            }
+        }
+        return res;
     }
 };
 ```
