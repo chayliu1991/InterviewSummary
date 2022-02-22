@@ -505,3 +505,34 @@ public:
     }
 };
 ```
+# [46. 全排列](https://leetcode-cn.com/problems/permutations/)
+
+```
+class Solution {
+public:
+    vector<vector<int>> permute(vector<int>& nums) {
+        vector<vector<int>> res;
+        backtrack(nums, res, 0);
+        return res;
+        
+    }
+    void backtrack(vector<int> &nums, vector<vector<int>> &res, int pos){
+        
+        // 达到目标，pos到最后 结束返回
+        if (pos == nums.size()){
+            res.push_back(nums);
+        }else{
+            for (int i = pos; i < nums.size(); ++i){
+                swap(nums[i],nums[pos]);       // 对应模板的 做出当前选择
+                backtrack(nums, res, pos + 1); // 搜索下一个位置 向前试探
+                swap(nums[i],nums[pos]);       // 对应模板的 撤销当前选择 -回溯
+            }
+        }
+    }
+};
+```
+
+https://zhuanlan.zhihu.com/p/310241003
+
+
+

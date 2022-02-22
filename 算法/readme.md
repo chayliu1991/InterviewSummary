@@ -248,16 +248,27 @@ while (l2 != NULL && l2->next!= NULL) {
 
 BFS 需要借助队列完成。
 - [547. 省份数量](https://leetcode-cn.com/problems/number-of-provinces/)
+
+- [46. 全排列](https://leetcode-cn.com/problems/permutations/)
+
 - [200. 岛屿数量](https://leetcode-cn.com/problems/number-of-islands/)
+
 - [463. 岛屿的周长](https://leetcode-cn.com/problems/island-perimeter/)
+
 - [22. 括号生成](https://leetcode-cn.com/problems/generate-parentheses/)
+
 - [12. 矩阵中的路径](https://leetcode-cn.com/problems/ju-zhen-zhong-de-lu-jing-lcof/)
+
 - [38. 字符串的排列](https://leetcode-cn.com/problems/zi-fu-chuan-de-pai-lie-lcof/)
 
 
 # 双指针
 
 - [455. 分发饼干](https://leetcode-cn.com/problems/assign-cookies/)
-- ​
+- [88. 合并两个有序数组](https://leetcode-cn.com/problems/merge-sorted-array/)
+- [633. 平方数之和](https://leetcode-cn.com/problems/sum-of-square-numbers/)
+- [680. 验证回文字符串 Ⅱ](https://leetcode-cn.com/problems/valid-palindrome-ii/)
+
+
 
 
