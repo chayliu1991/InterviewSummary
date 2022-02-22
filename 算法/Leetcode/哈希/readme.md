@@ -23,18 +23,17 @@ public:
 class Solution {
 public:
     int longestConsecutive(vector<int>& nums) {
-        std::unordered_set<int> hash(nums.begin(),nums.end());
-        int res = 0;
-        for(auto num : nums)
-        {
-            if(hash.find(num - 1) != hash.end())
-                continue;
-            int count = 1;
-            while(hash.find(++num) != hash.end())
-                count++;
-            res = std::max(res,count);
-        }
-        return res;
+		std::set<int> hash(nums.begin(),nums.end());
+		int res = 0,curr = 1;
+		for(const auto n : hash)
+		{
+			if(hash.find(n-1)!= hash.end())
+				curr += 1;
+			else
+				curr = 1;
+			res = std::max(res,curr);
+		}
+		return res;		
     }
 };
 ```
@@ -118,13 +117,12 @@ public:
 class Solution {
 public:
     bool isIsomorphic(string s, string t) {
-		vector<int> s_index(256,0),t_index(256,0);
-		for(int i = 0;i < s.length();i++)
+		std::unordered_map<int,int> hash_s,hash_t;
+		for(int i = 0;i < s.length();i ++)
 		{
-			if(s_index[s[i]] != t_index[t[i]])
+			if(hash_s[s[i]] != hash_t[t[i]])
 				return false;
-			s_index[s[i]] = t_index[t[i]] = i + 1;
-			
+			hash_s[s[i]] = hash_t[t[i]] = i + 1; //@ 防止混淆初始化时的 0
 		}
 		return true;
     }

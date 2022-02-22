@@ -270,5 +270,9 @@ BFS 需要借助队列完成。
 - [680. 验证回文字符串 Ⅱ](https://leetcode-cn.com/problems/valid-palindrome-ii/)
 
 
+# 哈希
 
+- [205. 同构字符串](https://leetcode-cn.com/problems/isomorphic-strings/)
+
+  ​
 
