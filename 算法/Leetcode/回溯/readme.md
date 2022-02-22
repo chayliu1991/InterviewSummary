@@ -80,31 +80,31 @@ public:
 ```
 class Solution {
 public:
-	vector<vector<int>> res;
-	vector<int> path;
-	
-	void backtrace(vector<int>& candidates, int target,int cur_sum,int cur_index)
-	{
-		if(cur_sum > target)
-			return;
-		if(cur_sum == target)
-		{
-			res.push_back(path);
-			return;
-		}
-		
-		for(int i = cur_index;i < candidates.size();i++)
-		{			
-			cur_sum += candidates[i];
-			path.push_back(candidates[i]);
-			backtrace(candidates,target,cur_sum,i); //@ 不用i+1了，表示可以重复读取当前的数
-			cur_sum -= candidates[i];
-			path.pop_back();			
-		}
-	}
     vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
-        backtrace(candidates, target, 0, 0);
+        std::vector<std::vector<int>> res;
+        std::vector<int> path;
+        backtrack(candidates,target,res,path,0);
         return res;
+    }
+
+    void backtrack(vector<int>& candidates, int target,std::vector<std::vector<int>>& res,std::vector<int>& path,int curr)
+    {
+        int sum = std::accumulate(path.begin(),path.end(),0);
+        if(sum > target)
+            return;
+
+        if(sum == target)
+        {
+            res.emplace_back(path);
+            return;
+        }
+
+        for(int i = curr;i < candidates.size();i++)
+        {
+            path.emplace_back(candidates[i]);
+            backtrack(candidates,target,res,path,i); //@ 元素可以重复
+            path.pop_back();
+        }
     }
 };
 ```
@@ -114,28 +114,26 @@ public:
 ```
 class Solution {
 public:
-    vector<vector<int>> result;
-    vector<int> path;
-	
-    void backtracking (vector<int>& nums, vector<bool>& used) {
-        if (path.size() == nums.size()) {
-            result.push_back(path);
+    vector<vector<int>> permute(vector<int>& nums) {
+        std::vector<std::vector<int>> res;
+        backtrack(nums,res,0);
+        return res;
+    }
+
+    void backtrack(vector<int>& nums,std::vector<std::vector<int>>& res,int curr)
+    {
+        if(curr == nums.size())
+        {
+            res.emplace_back(nums);
             return;
         }
-        for (int i = 0; i < nums.size(); i++) {
-            if (used[i] == true) 
-				continue; //@ path里已经收录的元素，直接跳过
-            used[i] = true;
-            path.push_back(nums[i]);
-            backtracking(nums, used);
-            path.pop_back();
-            used[i] = false;
+        
+        for(int i = curr;i < nums.size();i++)
+        {
+            std::swap(nums[curr],nums[i]);
+            backtrack(nums,res,curr+1);
+            std::swap(nums[curr],nums[i]);
         }
-    }
-    vector<vector<int>> permute(vector<int>& nums) {
-        vector<bool> used(nums.size(), false);
-        backtracking(nums, used);
-        return result;
     }
 };
 ```
