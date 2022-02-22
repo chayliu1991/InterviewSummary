@@ -4,42 +4,40 @@
 class Solution {
 public:
     bool exist(vector<vector<char>>& board, string word) {
-        if(board.empty() || board[0].empty() || word.empty())
-            return false;
-     
-        for(int i = 0;i < board.size();i++)
-        {
-            for(int j = 0;j < board[0].size();j++)
-            {
-                if(board[i][j] == word[0])
-                {
-                    if(dfs(board,word,i,j,0))
-                        return true;   
-                }      
-            }
-        }
-        return false;
-    }
-
-     bool dfs(vector<vector<char>>& board, string& word, int i, int j, int curr)
-    {
-        if(i < 0 || i >= board.size() || j < 0 || j >= board[0].size() || board[i][j] != word[curr]) 
+		if(board.empty() || board[0].empty() || word.empty())
 			return false;
-        if(curr == word.length() - 1) 
+		int rows = board.size(),cols = board[0].size();
+		for(int i= 0;i < rows;i++)
+		{
+			for(int j = 0;j < cols;j++)
+			{
+				if(board[i][j] == word[0] && dfs(board,word,i,j,0))
+					return true;
+			}
+		}
+		return false;
+	}
+    
+	
+	bool dfs(vector<vector<char>>& board, string word,int i,int j,int curr)
+	{
+		if(i < 0 || j < 0 || i >= board.size() || j >= board[0].size() || board[i][j] != word[curr])
+			return false;
+		
+		if(curr == word.length()-1)
 			return true;
-        char temp = board[i][j]; 
-        board[i][j] = '\0';
-        int dx[] = {1,0,-1,0},dy[] = {0,1,0,-1};
-       	for(int k = 0;k < 4;k++)
+		char tmp = board[i][j];
+		board[i][j] = '\0';
+		int dx[] = {1,0,-1,0} ,dy[] = {0,1,0,-1};
+		for(int k = 0;k < 4;k++)
 		{
 			int x = dx[k] + i,y = dy[k] + j;
 			if(dfs(board,word,x,y,curr+1))
 				return true;
-		}
-
-		board[i][j] = temp; 
-        return false;
-    }
+		}		
+		board[i][j] = tmp;
+		return false;
+	}
 };
 ```
 
@@ -506,28 +504,25 @@ public:
 class Solution {
 public:
     vector<string> permutation(string s) {
-        std::vector<std::string> res;
-        dfs(res,s,0);
-        return res;
+        if(s.empty()) 
+			return {};
+        std::set<std::string> res;
+        back_trace(s, 0, res);
+        return vector<string>(res.begin(), res.end());
     }
-
-    void dfs(std::vector<std::string>& res,std::string& s,int pos)
+    void back_trace(string s, int curr, std::set<string> &res)
     {
-        if(pos == s.size() -1)
+        if(curr == s.size())
         {
-            res.push_back(s);
+            res.insert(s);
             return;
         }
-
-        std::set<int> st;
-        for(int i = pos;i < s.size();i++)
+		
+        for(int i = curr; i < s.size(); i++)
         {
-            if(st.find(s[i]) != st.end())
-                continue;
-            st.insert(s[i]);
-            std::swap(s[i],s[pos]);
-            dfs(res,s,pos+1);
-            std::swap(s[i],s[pos]);
+            swap(s[i], s[curr]); //@ 做出选择
+            back_trace(s, curr + 1, res); //@ 进入下次决策树
+            swap(s[i], s[curr]); //@ 撤回选择
         }
     }
 };

@@ -4,20 +4,23 @@
 class Solution {
 public:
     ListNode* deleteNode(ListNode* head, int val) {
-        if(head == nullptr)
-            return head;
-        if(head->val == val)
-            return head->next;
-        
-        ListNode* curr = head,* prev = head;
-        while(curr)
-        {
-            if(curr->val == val)
-                prev->next = curr->next;
-            prev = curr;
-            curr = curr->next;
-        }
-        return head;
+			if(head == nullptr)
+				return head;
+				
+			ListNode* dummy = new ListNode(-1,head);
+			ListNode* curr = head,* prev = dummy;
+			while(curr)
+			{
+				if(curr->val != val){
+					prev->next = curr;
+					prev = prev->next;
+				}
+				else{
+					prev->next = curr->next;
+				}
+				curr = curr->next;
+			}
+			return dummy->next;
     }
 };
 ```

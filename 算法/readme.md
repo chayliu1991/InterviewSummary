@@ -244,28 +244,20 @@ while (l2 != NULL && l2->next!= NULL) {
 - [41. 数据流中的中位数](https://leetcode-cn.com/problems/shu-ju-liu-zhong-de-zhong-wei-shu-lcof/)
 
 
-# BFS && DFS
+# 搜索与回溯
 
-BFS 的整个解决分成下边几个步骤：
-
-- 起点入队列
-- 以队列非空为循环条件，进行节点扩散（将所有队列节点出队（同时判断出队节点是否为目标节点），获取其邻接结点）
-- 判断获取的节点是否已被遍历，未被遍历节点入队
-
-深度优先搜索整个过程可以分成如下步骤：
-
-- 判断终止条件
-- 对节点进行访问并加入到访问集合中
-- 以当前节点的邻接结点为起点，通过递归向更深层次进行搜索
-
+BFS 需要借助队列完成。
+- [547. 省份数量](https://leetcode-cn.com/problems/number-of-provinces/)
 - [200. 岛屿数量](https://leetcode-cn.com/problems/number-of-islands/)
-- [542. 01 矩阵](https://leetcode-cn.com/problems/01-matrix/)
 - [463. 岛屿的周长](https://leetcode-cn.com/problems/island-perimeter/)
 - [22. 括号生成](https://leetcode-cn.com/problems/generate-parentheses/)
 - [12. 矩阵中的路径](https://leetcode-cn.com/problems/ju-zhen-zhong-de-lu-jing-lcof/)
 - [38. 字符串的排列](https://leetcode-cn.com/problems/zi-fu-chuan-de-pai-lie-lcof/)
 
 
+# 双指针
 
+- [455. 分发饼干](https://leetcode-cn.com/problems/assign-cookies/)
+- ​
 
 
