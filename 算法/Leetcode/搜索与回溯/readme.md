@@ -505,6 +505,62 @@ public:
     }
 };
 ```
+# [77. 组合](https://leetcode-cn.com/problems/combinations/)
+
+```
+class Solution {
+public:
+    vector<vector<int>> combine(int n, int k) {
+		std::vector<std::vector<int>> res;
+		vector<int> path;
+		backtrack(n,k,res,path,1);
+        return res;
+    }
+	
+	void backtrack(int n, int k,std::vector<std::vector<int>>& res,vector<int>& path,int curr)
+	{
+		if(path.size() == k)
+		{
+			res.emplace_back(path);
+			return;
+		}
+		
+		for(int i = curr;i <= n;i++)
+		{
+			path.emplace_back(i);
+			backtrack(n,k,res,path,i+1);
+			path.pop_back();
+		}	
+	}	
+};
+```
+
+# [78. 子集](https://leetcode-cn.com/problems/subsets/)
+
+```
+class Solution {
+public:
+	vector<vector<int>> res;
+	vector<int> path;
+	
+	void backtrace(vector<int>& nums,int curr_index)
+	{
+		res.push_back(path);
+		for(int i = curr_index;i < nums.size();i++)
+		{
+			path.push_back(nums[i]);
+			backtrace(nums,i+1);
+			path.pop_back();
+		}		
+	}
+	
+    vector<vector<int>> subsets(vector<int>& nums) {
+		backtrace(nums,0);
+		return res;
+    }
+};
+```
+
 # [46. 全排列](https://leetcode-cn.com/problems/permutations/)
 
 ```
