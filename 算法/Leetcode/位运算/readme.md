@@ -4,14 +4,14 @@
 class Solution {
 public:
     int hammingDistance(int x, int y) {
-        int res = 0;
-        int diff = x ^ y;
-        while(diff)
-        {
-            diff &= (diff-1);
-            res ++;
-        }
-        return res;
+		int n = x ^ y;
+		int res = 0;
+		while(n)
+		{
+			res ++;
+			n &= (n-1);
+		}
+		return res;
     }
 };
 ```
@@ -55,7 +55,7 @@ public:
 class Solution {
 public:
     bool isPowerOfFour(int n) {
-        return n > 0 && !(n & (n - 1)) && !((n - 1) % 3);
+        return n > 0 && 0 == (n & (n - 1)) && n%3 == 1;
     }
 };
 ```
