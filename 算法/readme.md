@@ -298,3 +298,8 @@ BFS 需要借助队列完成。
 
 - #### [剑指 Offer 14- I. 剪绳子](https://leetcode-cn.com/problems/jian-sheng-zi-lcof/)
 
+# 位运算
+
+- [461. 汉明距离](https://leetcode-cn.com/problems/hamming-distance/)
+- [342. 4的幂](https://leetcode-cn.com/problems/power-of-four/)
+
