@@ -31,25 +31,24 @@ public:
 class Solution {
 public:
     void rotate(vector<vector<int>>& matrix) {
-        int n = matrix.size();
-
-        //@ 水平翻转
-        for(int i = 0;i < n /2;i++)
-        {
-            for(int j = 0;j < n;j++)
-            {
-                std::swap(matrix[i][j],matrix[n-i-1][j]);
-            }
-        }
-
-        //@ 主对角线翻转
-        for(int i = 0;i < n;i++)
-        {
-            for(int j = 0;j < i;j++)
-            {
-                std::swap(matrix[i][j],matrix[j][i]);
-            }
-        }
+		if(matrix.empty() || matrix[0].empty())
+			return;
+		int n = matrix.size();
+		int i = 0,j = n -1;
+		while(i < j)
+		{
+			for(int k = 0;k < n;k++)
+				std::swap(matrix[i][k],matrix[j][k]);
+			i++,j--;
+		}
+		
+		for(int i = 0;i < n;i++)
+		{
+			for(int j = 0;j < i;j++)
+			{
+				std::swap(matrix[i][j],matrix[j][i]);				
+			}
+		}
     }
 };
 ```
@@ -97,15 +96,16 @@ public:
 class Solution {
 public:
     int removeDuplicates(vector<int>& nums) {
-        if(nums.size() <= 1)
-            return nums.size();
-        int index = 1;
-        for(int i = 1;i < nums.size();i++)
-        {
-            if(nums[index-1] != nums[i])
-                nums[index++] = nums[i];
-        }
-        return index;
+		int n = nums.size();
+		if(n <= 1)
+			return n;
+		int index = 1;
+		for(int i = 1;i < n;i++)
+		{
+			if(nums[i-1] != nums[i])
+				nums[index++] = nums[i];
+		}
+		return index;
     }
 };
 ```
@@ -116,16 +116,16 @@ public:
 class Solution {
 public:
     int removeDuplicates(vector<int>& nums) {
-        if(nums.size() <= 2)
-            return nums.size();
-        
-        int index = 2;
-        for(int i = 2;i < nums.size();i++)
-        {
-            if(nums[i] != nums[index-2])
-                nums[index++] = nums[i];
-        }
-        return index;
+		int n = nums.size();
+		if(n <= 2)
+			return n;
+		int index = 2;
+		for(int i = 2;i < n;i++)
+		{
+			if(nums[index-2] != nums[i])
+				nums[index++] = nums[i];
+		}
+		return index;
     }
 };
 ```
@@ -154,41 +154,40 @@ public:
 class Solution {
 public:
     vector<vector<int>> threeSum(vector<int>& nums) {
-        int n = nums.size();
+		int n = nums.size();
         if(n < 3)
             return {};
-        
-        std::sort(nums.begin(),nums.end());
-        std::vector<std::vector<int>> res;
-        for(int i = 0;i < n-2;i++)
-        {
-            if(nums[i] > 0)
-                break;
-            if(i > 0 && nums[i] == nums[i-1])
-                continue;
-            int left = i+1,right = n-1;
-            int target = -nums[i];
-            while(left < right)
-            {
-                int sum = nums[left] + nums[right];
-                if(sum == target)
-                {
-                    std::vector<int> tmp{nums[i],nums[left],nums[right]};
-                    res.push_back(tmp);
-                    left++,right--;
-
-                    while(left < right && nums[left] == nums[left-1])
-                        left++;
-                    while(left < right && nums[right] == nums[right+1])
-                        right--;
-                }
-                else if(sum > target)
-                    right--;
-                else
-                    left++;
-            }
-        }
-        return res;
+		std::sort(nums.begin(),nums.end());
+		std::vector<std::vector<int>> res;
+		
+		for(int i = 0;i < n;i++)
+		{
+			if(nums[i] > 0)
+				break;
+			if(i > 0 && nums[i] == nums[i-1])
+				continue;
+			int target = -nums[i];
+			int left = i + 1,right = n - 1;
+			while(left < right)
+			{
+				int sum = nums[left] + nums[right];
+				if(sum == target)
+				{
+					res.emplace_back(std::vector<int>{nums[i],nums[left],nums[right]});
+					left++,right--;
+					while(left < right && nums[left] == nums[left-1])
+						left++;
+					while(left < right && nums[right] == nums[right+1])
+						right--;
+				}			
+				else if(sum > target)
+					right--;
+				else
+					left++;
+			}
+		}
+		
+		return res;
     }
 };
 ```
@@ -199,16 +198,20 @@ public:
 class Solution {
 public:
     vector<vector<int>> matrixReshape(vector<vector<int>>& mat, int r, int c) {
-        int rows = mat.size(),cols = mat[0].size();
-        if(rows * cols != r * c)
-            return mat;
-        
-        std::vector<std::vector<int>> res(r,std::vector<int>(c,0));
-        for(int i = 0;i < r*c;i++)
-        {
-            res[i/c][i%c] = mat[i/cols][i%cols];
-        }
-        return res;
+		int rows = mat.size(),cols = mat[0].size();
+		if(rows * cols != r * c)
+			return mat;
+		vector<vector<int>> res(r,std::vector<int>(c));
+		int k = 0;
+		for(int i = 0;i < r;i++)
+		{
+			for(int j = 0;j < c;j++)
+			{
+				res[i][j] = mat[k/cols][k%cols];
+				k++;
+			}
+		}
+		return res;
     }
 };
 ```
@@ -221,16 +224,16 @@ public:
     vector<vector<int>> merge(vector<vector<int>>& intervals) {
 		if(intervals.empty())
 			return {};
-		
-		//@ 默认按照各个位置上元素的字典序依次比较大小
-		sort(intervals.begin(),intervals.end());
-		vector<vector<int>> res;
-		for (int i = 0; i < intervals.size(); ++i) {
-			int L = intervals[i][0],R = intervals[i][1];
-			if(res.empty() || res.back()[1] < L)
-				res.push_back({L,R});
+		std::vector<std::vector<int>> res;
+		std::sort(intervals.begin(),intervals.end());
+		res.emplace_back(intervals[0]);
+		for(int i = 1;i < intervals.size();i++)
+		{
+			auto& curr = intervals[i];
+			if(curr[0] <= res.back()[1])
+				res.back()[1] = std::max(curr[1],res.back()[1]);
 			else
-				res.back()[1] = max(res.back()[1],R);
+				res.emplace_back(curr);
 		}
 		return res;
     }
@@ -246,21 +249,20 @@ public:
 		if(intervals.empty())
 			return 0;
 		int res = 0;
-		sort(intervals.begin(),intervals.end());
-		int last = 0; //@ 上一个被保留的区间
+		std::sort(intervals.begin(),intervals.end());
+		int last = 0;
 		for(int i = 1;i < intervals.size();i++)
 		{
-			if(intervals[i][0] < intervals[last][1])
+			auto& curr = intervals[i];
+			if(curr[0] < intervals[last].back())
 			{
-				//@ 区间重叠，需要删除一个区间
-				res++;
-				//@ 被删除的区间选择区间末尾比较的，从而尽可能的避免重叠
-				if(intervals[i][1] < intervals[last][1])
+				res += 1;
+				if(curr[1] < intervals[last][1])
 					last = i;
 			}
 			else
 				last = i;
-		}
+		}		
 		return res;
     }
 };
@@ -272,22 +274,22 @@ public:
 class Solution {
 public:
     int findMinArrowShots(vector<vector<int>>& points) {
-        if (points.empty()) 
+		if(points.empty())
 			return 0;
-        sort(points.begin(), points.end());
-        int res = 1; //@ 先来一支箭
-        int last = points[0][1]; //@ 上一只箭覆盖到的最远范围
-        for (int i = 1; i < points.size(); ++i) 
-        {
-            if (points[i][0] <= last)
-                last = min(last, points[i][1]);
-            else 
-            {
-                ++res;
-                last = points[i][1];
-            }
-        }
-        return res;
+		std::sort(points.begin(), points.end());
+		int res = 1;
+		int last_pos = points[0][1];
+		for(int i = 1;i < points.size();i++)
+		{
+			if(points[i][0] <= last_pos)
+				last_pos = std::min(points[i][1],last_pos);
+			else
+			{
+				res++;
+				last_pos = points[i][1];
+			}
+		}
+		return res;
     }
 };
 ```
@@ -298,20 +300,22 @@ public:
 class Solution {
 public:
     vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {
-		intervals.push_back(newInterval);
-		sort(intervals.begin(),intervals.end());
-		vector<vector<int>> res;
-		for(int i = 0;i < intervals.size();i++)
+		intervals.emplace_back(newInterval);
+		std::vector<std::vector<int>> res;
+		std::sort(intervals.begin(),intervals.end());
+		res.emplace_back(intervals[0]);
+		for(int i = 1;i < intervals.size();i++)
 		{
-			int L = intervals[i][0],R = intervals[i][1];
-			if(res.empty() || res.back()[1] < L)
-				res.push_back({L,R});
+			auto& curr = intervals[i];
+			if(curr[0] <= res.back()[1])
+				res.back()[1] = std::max(curr[1],res.back()[1]);
 			else
-				res.back()[1] = max(res.back()[1],R);			
-		}		
+				res.emplace_back(curr);
+		}
 		return res;
     }
 };
+
 ```
 
 # [54. 螺旋矩阵](https://leetcode-cn.com/problems/spiral-matrix/)
@@ -320,32 +324,27 @@ public:
 class Solution {
 public:
     vector<int> spiralOrder(vector<vector<int>>& matrix) {
-        vector <int> res;
-        if(matrix.empty()) 
-            return res; 
-        //@ 赋值上下左右边界
-        int up = 0,down = matrix.size() - 1,left = 0,right = matrix[0].size() - 1;
-        while(true)
-        {
-            for(int i = left; i <= right; ++i) 
-				res.push_back(matrix[up][i]); //@ 向右移动直到最右			
-            if(++ up > down) 
-				break; //@ 重新设定上边界，若上边界大于下边界，则遍历遍历完成
-			
-            for(int i = up; i <= down; ++i) 
-				res.push_back(matrix[i][right]); //@ 向下
-            if(-- right < left) 
-				break; //@ 重新设定右边界
-			
-            for(int i = right; i >= left; --i) 
-				res.push_back(matrix[down][i]); //@ 向左
-            if(-- down < up) 
-				break; //@ 重新设定下边界
-			
-            for(int i = down; i >= up; --i) 
-				res.push_back(matrix[i][left]); //@ 向上
-            if(++ left > right) 
-				break; //@ 重新设定左边界
+        if (matrix.empty() || matrix[0].empty())
+            return {};
+      
+        
+		int dx[] = {0,1,0,-1},dy[] ={1,0,-1,0};
+		int rows = matrix.size(),cols = matrix[0].size();
+		std::vector<std::vector<bool>> visited(rows,std::vector<bool>(cols));
+		int n = rows * cols;
+		std::vector<int> res(n);
+		
+		int x = 0,y = 0,index = 0;		
+        for (int i = 0; i < n; i++)
+		{
+            res[i] = matrix[x][y];
+            visited[x][y] = true;
+            int tx = x + dx[index], ty = y + dy[index];
+            if (tx < 0 || tx >= rows || ty < 0 || ty >= cols || visited[tx][ty]) 		
+                index = (index + 1) % 4;
+        
+            x += dx[index];
+            y += dy[index];
         }
         return res;
     }
@@ -357,33 +356,31 @@ public:
 ```
 class Solution {
 public:
-    vector<vector<int>> imageSmoother(vector<vector<int>>& M) 
-    {       
-        int m = M.size(),n = M[0].size();
-        vector<vector<int>> res(M);
-        int col=M[0].size();
-        vector<vector<int>> dir {{-1,0},{1,0},{0,1},{0,-1},{-1,-1},{-1,1},{1,-1},{1,1}};
-        for(int i = 0;i < m;i++)
-        {
-            for(int j = 0;j < n;j++)
-            {
-                int count = 1;       
-                for(const auto d : dir)
-                {
-                    int x = i + d[0];
-                    int y = j + d[1];                    
-                    
-                    if(0 <= x && x < m && 0 <= y && y < n)
-                    {
-                        count++;
-                        res[i][j] += M[x][y];
-                    }                    
-                }
-                res[i][j] = res[i][j] / count;
-            }
-        }
-        return res;
-    }
+    vector<vector<int>> imageSmoother(vector<vector<int>>& img) {
+		if(img.empty() || img[0].empty())
+			return {};
+		int rows = img.size(),cols = img[0].size();
+		std::vector<std::vector<int>> res(rows,std::vector<int>(cols));
+		int dx[] = {-1,-1,-1,0,0,0,1,1,1},dy[] = {-1,0,1,-1,0,1,-1,0,1};
+		for(int i = 0;i < rows;i++)
+		{
+			for(int j = 0;j < cols;j++)
+			{
+				int sum = 0;
+				int count = 0; 
+				for(int k = 0;k < 9;k++)
+				{
+					int x = i + dx[k],y = j + dy[k];
+					if(x >= 0 && x < rows && y >= 0 && y <cols){
+						sum += img[x][y];
+						count ++;
+					}
+				}
+				res[i][j] = sum / count;
+			}
+		}
+		return res;
+    }	
 };
 ```
 

@@ -271,5 +271,30 @@ BFS 需要借助队列完成。
 
 - [205. 同构字符串](https://leetcode-cn.com/problems/isomorphic-strings/)
 
-  
+
+# 数组
+
+- [48. 旋转图像](https://leetcode-cn.com/problems/rotate-image/)
+
+- [27. 移除元素](https://leetcode-cn.com/problems/remove-element/)
+
+- [26. 删除有序数组中的重复项](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-array/)
+
+- [80. 删除有序数组中的重复项 II](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-array-ii/)
+
+- [15. 三数之和](https://leetcode-cn.com/problems/3sum/)
+
+- [435. 无重叠区间](https://leetcode-cn.com/problems/non-overlapping-intervals/)
+
+- [452. 用最少数量的箭引爆气球](https://leetcode-cn.com/problems/minimum-number-of-arrows-to-burst-balloons/)
+
+- [54. 螺旋矩阵](https://leetcode-cn.com/problems/spiral-matrix/)
+
+- [57 - II. 和为s的连续正数序列](https://leetcode-cn.com/problems/he-wei-sde-lian-xu-zheng-shu-xu-lie-lcof/)
+
+- [ 62. 圆圈中最后剩下的数字](https://leetcode-cn.com/problems/yuan-quan-zhong-zui-hou-sheng-xia-de-shu-zi-lcof/)
+
+- [44. 数字序列中某一位的数字](https://leetcode-cn.com/problems/shu-zi-xu-lie-zhong-mou-yi-wei-de-shu-zi-lcof/)
+
+- #### [剑指 Offer 14- I. 剪绳子](https://leetcode-cn.com/problems/jian-sheng-zi-lcof/)
 

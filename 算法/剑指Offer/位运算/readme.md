@@ -21,23 +21,31 @@ public:
 class Solution {
 public:
     vector<int> singleNumbers(vector<int>& nums) {
-        int sum = 0;
-        for(const auto n : nums)
-            sum ^= n;
-        
-        int mask = 1;
-        while((mask & sum) == 0)
-            mask <<= 1;
-
-        int n1 = 0,n2 = 0;
-        for(const auto n : nums)
-        {
-            if(mask & n)
-                n1 ^= n;
-            else
-                n2 ^= n;
-        }
-        return {n1,n2};
+		if(nums.empty())
+			return {};
+			
+		int XOR = 0;
+		for(const auto n : nums)
+			XOR ^= n;
+		int uncommon = 1;
+		for(int i = 0;i < 32;i++)
+		{
+			if((uncommon << i) & XOR)
+			{
+				uncommon <<= i;
+				break;
+			}				
+		}
+		
+		int a = 0,b = 0;
+		for(const auto n : nums)
+		{
+			if(uncommon & n)
+				a ^= n;
+			else
+				b ^= n;
+		}
+		return {a,b};
     }
 };
 ```

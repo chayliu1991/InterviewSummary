@@ -88,15 +88,14 @@ public:
 class Solution {
 public:
     int findNthDigit(int n) {
-        long k = n;
-        for(int i = 1;;i++)
-        {
-            if(i * pow(10,i) > k)
-            {
-                return std::to_string(k/i)[k%i] - '0';
-            }
-            k += pow(10,i);
-        }
+		long pos = n;
+		for(int i = 1;;i++)
+		{
+			if(i * pow(10,i) > pos)
+				return std::to_string(pos/i)[pos%i] - '0';
+			pos += pow(10,i);
+		}
+		return -1;
     }
 };
 ```
@@ -107,32 +106,32 @@ public:
 class Solution {
 public:
     vector<vector<int>> findContinuousSequence(int target) {
-        int left = 1,right = 1;
-        vector<vector<int>>  res;
+		int left = 1,right = 1;
+		std::vector<std::vector<int>> res;
 		int sum = 0;
-        while(left <= target/2)
-        {
-            if(sum < target)
-			{
-				sum += right;
-				right++;		
+		while(left <= target / 2)
+		{
+			if(sum == target)
+			{	
+				std::vector<int> path;
+				for(int i = left;i < right;i++)
+					path.emplace_back(i);
+				res.emplace_back(path);
+				sum -= left;
+				left++;
 			}
 			else if(sum > target)
 			{
 				sum -= left;
-				left++;	
+				left++;
 			}
 			else
 			{
-				vector<int> v;
-				for(int i = left;i < right;i++)
-					v.push_back(i);
-				res.push_back(v);	
-				sum -= left;
-				left ++;	
-			}			
-        }
-        return res;
+				sum += right;
+				right++;				
+			}
+		}
+		return res;
     }
 };
 ```
