@@ -91,10 +91,11 @@ int search(std::vector<int> nums,int target)
 - [188. 买卖股票的最佳时机 IV](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iv/)
 - [309. 最佳买卖股票时机含冷冻期](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/)
 - [714. 买卖股票的最佳时机含手续费](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/)
-- [300. 最长递增子序列](https://leetcode-cn.com/problems/longest-increasing-subsequence/)
-- [1143. 最长公共子序列](https://leetcode-cn.com/problems/longest-common-subsequence/)
 - [416. 分割等和子集](https://leetcode-cn.com/problems/partition-equal-subset-sum/)
 - [322. 零钱兑换](https://leetcode-cn.com/problems/coin-change/)
+- [5. 最长回文子串](https://leetcode-cn.com/problems/longest-palindromic-substring/)
+- [300. 最长递增子序列](https://leetcode-cn.com/problems/longest-increasing-subsequence/)
+- [1143. 最长公共子序列](https://leetcode-cn.com/problems/longest-common-subsequence/)
 
 
 # 贪心
@@ -303,3 +304,8 @@ BFS 需要借助队列完成。
 - [461. 汉明距离](https://leetcode-cn.com/problems/hamming-distance/)
 - [342. 4的幂](https://leetcode-cn.com/problems/power-of-four/)
 
+
+# 字符串
+
+- [647. 回文子串](https://leetcode-cn.com/problems/palindromic-substrings/)
+- ​
