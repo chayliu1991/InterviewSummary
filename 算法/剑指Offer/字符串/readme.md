@@ -23,47 +23,44 @@ public:
 class Solution {
 public:
     bool isNumber(string s) {
-		while(!s.empty() && s[0] == ' ')
-			s.erase(0,1);
-		while(!s.empty() && s[s.length()-1] == ' ')
-			s.erase(s.length()-1,1);
-		
-		if(s.empty())
-			return false;
-		
-		bool dot = false,exp = false,num = false;
-		int last = s.length()-1;
-		for(int i =0;i<s.length();i++)
-		{
-			switch(s[i])
-			{
-				case ' ':
-					return false;
-				case '+':
-				case '-':
-					if((i > 0 && s[i-1] != 'E' && s[i-1] != 'e') || (i == last))
-						return false;
-					break;
-				case 'E':
-				case 'e':
-					if(exp || i == last || !num)
-						return false;
-					exp = true;
+        while(!s.empty() && s[0] == ' ')
+            s.erase(0,1);
+        while(!s.empty() && s.back() == ' ')
+            s.pop_back();
+        if(s.empty())
+            return false;
+        bool dot = false,num = false,exp = false;
+        int len = s.length();
+        int last = len - 1;
+
+        for(int i = 0;i < len;i++)
+        {
+            switch(s[i])
+            {
+                case '+':
+                case '-':
+                    if( (i > 0 && s[i-1] != 'e' && s[i-1] != 'E') || i == last)
+                        return false;
                     break;
-				case '.':
-					if(dot || exp || (i == last && !num))
-						return false;
-					dot = true;
-					break;
-				default:
-					if(s[i] >= '0' && s[i] <= '9')
-						num = true;
-					else
-						return false;
-					break;
-			}			
-		}		
-		return true;
+                case 'e':
+                case 'E':
+                    if(exp || !num || i == last)
+                        return false;
+                    exp = true;
+                    break;
+                case '.':
+                    if(dot || exp || (i == last && !num))
+                        return false;
+                    dot = true;
+                    break;
+                default:
+                    if(s[i] >= '0' && s[i] <= '9')
+                        num = true;
+                    else
+                        return false;                
+            }
+        }
+        return true;
     }
 };
 ```

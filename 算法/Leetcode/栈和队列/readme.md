@@ -8,19 +8,20 @@ public:
     }
     
     void push(int x) {
-        data.push(x);
+        q.push(x);
     }
     
     int pop() {
         std::queue<int> tmp;
-        while(data.size() > 1)
+        while(q.size() > 1)
         {
-            tmp.push(data.front());
-            data.pop();
+            tmp.push(q.front());
+            q.pop();
         }
-        int res = data.front();
-        data.pop();
-        data = std::move(tmp);
+
+        int res = q.front();
+        q.pop();
+        q = std::move(tmp);
         return res;
     }
     
@@ -31,11 +32,10 @@ public:
     }
     
     bool empty() {
-        return data.empty();
+        return q.empty();
     }
-    
-private:
-    std::queue<int> data;
+
+    std::queue<int> q;
 };
 ```
 
@@ -57,11 +57,13 @@ public:
         {
             while(!s_in.empty())
             {
-                s_out.push(s_in.top());
+                s_out.emplace(s_in.top());
                 s_in.pop();
             }
         }
 
+        if(s_out.empty())
+            return -1;
         int res = s_out.top();
         s_out.pop();
         return res;
@@ -72,11 +74,13 @@ public:
         {
             while(!s_in.empty())
             {
-                s_out.push(s_in.top());
+                s_out.emplace(s_in.top());
                 s_in.pop();
             }
         }
 
+        if(s_out.empty())
+            return -1;
         int res = s_out.top();
         return res;
     }
@@ -85,8 +89,7 @@ public:
         return s_in.empty() && s_out.empty();
     }
 
-    std::stack<int> s_in;
-    std::stack<int> s_out;
+    std::stack<int> s_in,s_out;
 };
 ```
 

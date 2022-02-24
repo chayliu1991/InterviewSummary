@@ -345,52 +345,40 @@ KMP：
 ```
 class Solution {
 public:
-    vector<int> getnext(string str)
+    std::vector<int> get_next(std::string& str)
+    {
+        int len = str.length();
+        std::vector<int> res{-1};
+        int j = 0,k = -1;
+        while(j < len -1)
         {
-            int len=str.size();
-            vector<int> next;
-            next.push_back(-1);//next数组初值为-1
-            int j=0,k=-1;
-            while(j<len-1)
+            if(k == -1 || str[j] == str[k])
             {
-                if(k==-1||str[j]==str[k])//str[j]后缀 str[k]前缀
-                {
-                    j++;
-                    k++;
-                    next.push_back(k);
-                }
-                else
-                {
-                    k=next[k];
-                }
+                j++;
+                k++;
+                res.emplace_back(k);
             }
-            return next;
+            else
+                k = res[k];
         }
+        return res;
+    }
+
     int strStr(string haystack, string needle) {
         if(needle.empty())
             return 0;
-        
-        int i=0;//源串
-        int j=0;//子串
-        int len1=haystack.size();
-        int len2=needle.size();
-        vector<int> next;
-        next=getnext(needle);
-        while((i<len1)&&(j<len2))
+        int i = 0,j = 0;
+        int len1 = haystack.length(),len2 = needle.length();
+        std::vector<int> next = get_next(needle);
+        while(i < len1 && j < len2)
         {
-            if((j==-1)||(haystack[i]==needle[j]))
-            {
-                i++;
-                j++;
-            }
+            if(j == -1 || haystack[i] == needle[j])
+                i++,j++;
             else
-            {
-                j=next[j];//获取下一次匹配的位置
-            }
+                j = next[j];
         }
-        if(j==len2)
-            return i-j;
-        
+        if(j == len2)
+            return i - j;
         return -1;
     }
 };
