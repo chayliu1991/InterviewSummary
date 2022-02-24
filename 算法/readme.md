@@ -271,6 +271,7 @@ BFS 需要借助队列完成。
 # 哈希
 
 - [205. 同构字符串](https://leetcode-cn.com/problems/isomorphic-strings/)
+- [3. 无重复字符的最长子串](https://leetcode-cn.com/problems/longest-substring-without-repeating-characters/)
 
 
 # 数组
@@ -308,4 +309,9 @@ BFS 需要借助队列完成。
 # 字符串
 
 - [647. 回文子串](https://leetcode-cn.com/problems/palindromic-substrings/)
-- ​
+- [151. 翻转字符串里的单词](https://leetcode-cn.com/problems/reverse-words-in-a-string/)
+- [224.基本计算器](https://leetcode-cn.com/problems/basic-calculator)
+- [227.基本计算器II](https://leetcode-cn.com/problems/basic-calculator-ii)
+- [32. 最长有效括号](https://leetcode-cn.com/problems/longest-valid-parentheses/)
+- [524. 通过删除字母匹配到字典里最长单词](https://leetcode-cn.com/problems/longest-word-in-dictionary-through-deleting/)
+- [28. 实现 strStr()](https://leetcode-cn.com/problems/implement-strstr/)

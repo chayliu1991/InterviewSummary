@@ -96,8 +96,6 @@ public:
 
 ```
 
-
-
 原地翻转：
 
 ```
@@ -179,40 +177,42 @@ public:
 class Solution {
 public:
     int calculate(string s) {
-		stack<int> sign;
-		sign.push(1);
-		int res = 0,num = 0,oper = 1; //@ oper 只取1或者-1 ，分别表示加上或者减去
-		for(auto c : s)
+		long res = 0,sign = 1,num = 0;
+		std::stack<int> ops;
+		for(const auto c : s)
 		{
-			if(c == ' ')
-				continue;
 			if(isdigit(c))
+				num = num * 10 + c - '0';
+			else if(c == '+' || c == '-')
 			{
-				num = num * 10 + (c - '0');
-				continue;
+				res += num * sign;
+				sign = (c == '+' ? 1 : -1);
+				num = 0;
 			}
-			
-			res += oper * num;
-			num = 0;
-			switch(c)
+			else if(c == '(')
 			{
-				case '+':
-					oper = sign.top();
-					break;
-				case '-':
-					oper = -sign.top();
-					break;
-				case '(':    //@ 将括号的整体看成是一个数，结果统一取 '+' 或者取 '-'
-					sign.push(oper);
-					break;
-				case ')':
-					sign.pop();
-			}	
+				ops.emplace(res);
+				ops.emplace(sign);
+				res = 0;
+				sign = 1;
+				num = 0;
+			}
+			else if(c == ')')
+			{
+				res += num * sign;
+				num = 0;
+				res *= ops.top();
+				ops.pop();
+				res += ops.top();
+				ops.pop();
+			}			
 		}
-		res += oper * num;
+		
+		res += sign * num;
 		return res;
     }
 };
+
 ```
 
 # [227.基本计算器II](https://leetcode-cn.com/problems/basic-calculator-ii)
@@ -221,50 +221,41 @@ public:
 class Solution {
 public:
     int calculate(string s) {
-		stack<int> stk;
-		int res = 0,n = 0;
-		char oper = '+';  //@ 在字符串前人为添加 '+' 不影响计算结果
-		for(int i = 0;i < s.length();++i)
+		std::vector<long> nums;
+		char prev_sign = '+';		
+		long num = 0;
+		int len = s.length();
+		for(int i = 0;i < len;i++)
 		{
-			char curr = s[i];
-			if(isdigit(curr))
-				n = n * 10 + (curr - '0');
-			if((!isdigit(curr) && curr != ' ') || i == s.length()-1)
+			if(isdigit(s[i]))	
+				num = num * 10 + s[i] - '0';
+				
+			if(!isdigit(s[i]) && s[i] != ' ' || i == len-1)
 			{
-				int prev = 0;
-				switch(oper)
+				switch(prev_sign)
 				{
-					case '+':
-						stk.push(n);
-						break;
-					case '-':
-						stk.push(-n);
-						break;
-					case '*':
-						prev = stk.top();
-						stk.pop();
-						stk.push(prev * n);
-						break;
-					case '/':
-						prev = stk.top();
-						stk.pop();
-						stk.push(prev / n);
+				case '+':
+					nums.emplace_back(num);
+					break;
+				case '-':
+					nums.emplace_back(-num);
+					break;
+				case '*':
+					nums.back() *= num;
+					break;
+				default:
+					nums.back() /= num;
 					break;					
 				}
 				
-				oper = curr;  //@ 更新符号
-				n = 0; //@ 重置0
-			}
-		}	
-		
-		while(!stk.empty())
-		{
-			res += stk.top();
-			stk.pop();
-		}			
-		return res;		
+				prev_sign = s[i];
+				num = 0;
+			}			
+		}
+		return std::accumulate(nums.begin(),nums.end(),0);
     }
 };
+
 ```
 
 # [3. 无重复字符的最长子串](https://leetcode-cn.com/problems/longest-substring-without-repeating-characters/)
@@ -273,16 +264,15 @@ public:
 class Solution {
 public:
     int lengthOfLongestSubstring(string s) {
-		//@ left是窗口左边界的前一个位置，始化为 -1 
-		int res = 0,left = -1,n = s.length();
-		unordered_map<int,int> dict;
-		
-		for(int i = 0;i < n;i++)
-		{
-			if(dict.count(s[i]) && dict[s[i]] > left)
-				left = dict[s[i]];
-			dict[s[i]] = i;
-			res = max(res,i-left);
+		int res = 0,left = -1;
+		std::unordered_map<int,int> hash;
+		for(int i = 0;i < s.length();i++)
+		{	
+			auto c = s[i];
+			if(hash.count(c) && left <= hash[c])
+				left = hash[c];
+			hash[c] = i;
+			res = std::max(res,i-left);
 		}
 		return res;
     }
@@ -294,25 +284,24 @@ public:
 ```
 class Solution {
 public:
-    int longestValidParentheses(string s)
-    {	
-        int res = 0;
-        stack<int> sk;
-        sk.push(-1);  //@ 无效位置
-        for (int i = 0; i < s.length(); i++)
-        {
-            if (s[i] == '(')
-                sk.push(i);
-            else
-            {
-                sk.pop();
-                if (sk.empty())
-                    sk.push(i); //@ 上一个无效的位置
-                else
-                    res = max(res, i - sk.top());
-            }
-        }
-        return res;
+    int longestValidParentheses(string s) {		
+		int res = 0;
+		std::stack<int> sk;
+		sk.push(-1);
+		for(int i = 0;i < s.length();i++)
+		{
+			if(s[i] == '(')
+				sk.push(i);
+			else
+			{
+				sk.pop();
+				if(sk.empty())
+					sk.push(i);
+				else
+					res = std::max(i-sk.top(),res);
+			}
+		}
+		return res;
     }
 };
 ```
@@ -322,29 +311,30 @@ public:
 ```
 class Solution {
 public:
-    string findLongestWord(string s, vector<string>& d) {
-        string best;
-        for(auto const & str : d)
-        {
-            int l1 = best.size(),l2 = str.size();
-            if(l1 > l2 || (l1 == l2 && best.compare(str) < 0))
-                continue;
-            if(isSubstr(s,str))
-                best = str;
-        }
-        return best;
+    string findLongestWord(string s, vector<string>& dictionary) {
+		std::string res;
+		for(const auto& str : dictionary)
+		{
+			int l1 = res.length(),l2 = str.length();
+			if(l1 > l2 || l1 == l2 && res.compare(str) < 0)
+				continue;
+			if(is_substr(s,str))
+				res = str;		
+		}
+		return res;
     }
-
-    bool isSubstr(string& s,string str)
-    {
-        int i = 0,j = 0;
-        while(i < s.length() && j < str.length()){
-            if(s[i] == str[j])
-                j++;
-            i++;
-        }
-        return j == str.length();
-    }
+	
+	bool is_substr(const std::string& s1,const std::string& s2)
+	{
+		int i = 0,j = 0;
+		while(i < s1.length() && j < s2.length())
+		{
+			if(s1[i] == s2[j])
+				j++;
+			i++;
+		}
+		return j == s2.length();
+	}
 };
 ```
 
