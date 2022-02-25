@@ -37,27 +37,6 @@ public:
 };
 ```
 
-# [19. 正则表达式匹配](https://leetcode-cn.com/problems/zheng-ze-biao-da-shi-pi-pei-lcof/)
-
-```
-class Solution {
-public:
-    bool isMatch(string s, string p) {
-        if(p.empty())
-            return s.empty();
-        
-        auto matched = [&](){
-            return s[0] == p[0] || p[0] == '.';
-        };
-
-        if(p[1] == '*')
-            return isMatch(s,p.substr(2)) || (!s.empty() && matched() && isMatch(s.substr(1),p));
-        else
-            return !s.empty() && matched() && (isMatch(s.substr(1),p.substr(1)));
-    }
-};
-```
-
 # [20. 有效的括号](https://leetcode-cn.com/problems/valid-parentheses/)
 
 ```
@@ -180,33 +159,30 @@ public:
     }
     
     int max_value() {
-        if(dq.empty())
+        if(max_q.empty())
             return -1;
-        return dq.front();
+        return max_q.front();
     }
     
     void push_back(int value) {
-        data.push(value);
-        
-        while(!dq.empty() && dq.back() <= value)
-            dq.pop_back();
-        
-        dq.push_back(value);
+		data_q.emplace(value);
+		while(!max_q.empty() && max_q.back() <= value)
+			max_q.pop_back();
+		max_q.emplace_back(value);	
     }
     
     int pop_front() {
-        if(data.empty())
-            return -1;
-        
-        int res = data.front();
-        data.pop();
-        while(!dq.empty() && dq.front() == res)
-            dq.pop_front();
-        return res;
+		if(data_q.empty())
+			return -1;
+		int res = data_q.front();
+		data_q.pop();
+		while(!max_q.empty() && max_q.front() == res)
+			max_q.pop_front();
+		return res;
     }
-
-    std::deque<int> dq;
-    std::queue<int> data;
+	
+	std::queue<int> data_q;
+	std::deque<int> max_q;
 };
 ```
 

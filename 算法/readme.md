@@ -320,3 +320,9 @@ BFS 需要借助队列完成。
 
 # 栈和队列
 
+- [739. 每日温度](https://leetcode-cn.com/problems/daily-temperatures/)
+- [239. 滑动窗口最大值](https://leetcode-cn.com/problems/sliding-window-maximum/)
+- [42. 接雨水](https://leetcode-cn.com/problems/trapping-rain-water/)
+- [84. 柱状图中最大的矩形](https://leetcode-cn.com/problems/largest-rectangle-in-histogram/)
+- [59 - II. 队列的最大值](https://leetcode-cn.com/problems/dui-lie-de-zui-da-zhi-lcof/)
+

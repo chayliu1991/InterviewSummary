@@ -165,20 +165,26 @@ public:
 class Solution {
 public:
     vector<int> dailyTemperatures(vector<int>& temperatures) {
-        int n = temperatures.size();
-        std::vector<int> res(n);
-        std::stack<int> s;
-        for(int i = 0;i < n;++i)
-        {
-            while(!s.empty() && temperatures[i] > temperatures[s.top()])
-            {
-                int index = s.top();
-                res[index] = i - index;
-                s.pop();
-            }
-            s.push(i);
-        }
-        return res;
+		int n = temperatures.size();
+		std::vector<int> res(n);
+		std::stack<int> st;  //@ top->bottom is increase
+		st.emplace(0);
+		for(int i = 1;i < n;i++)
+		{
+			auto & curr = temperatures[i];
+			if(curr <= temperatures[st.top()])
+				st.emplace(i);
+			else
+			{
+				while(!st.empty() && curr > temperatures[st.top()])
+				{
+					res[st.top()] = i - st.top();
+					st.pop();
+				}
+				st.emplace(i);
+			}
+		}
+		return res;
     }
 };
 ```
@@ -234,7 +240,7 @@ public:
         {
             while(!dq.empty() && nums[dq.back()] <= nums[i])
                 dq.pop_back();
-            dq.push_back(i);
+            dq.emplace_back(i);
         }
         res.emplace_back(nums[dq.front()]);
 
@@ -244,7 +250,7 @@ public:
                 dq.pop_front();
              while(!dq.empty() && nums[dq.back()] <= nums[i])
                 dq.pop_back();
-            dq.push_back(i);
+            dq.emplace_back(i);
             res.emplace_back(nums[dq.front()]);
         }
         return res;
@@ -258,23 +264,37 @@ public:
 class Solution {
 public:
     int largestRectangleArea(vector<int>& heights) {
-        int res = 0;
-        std::stack<int> s;
-        heights.push_back(0);
-        for(int i = 0;i < heights.size();)
-        {
-            if(s.empty() || heights[i] > heights[s.top()])
-            {
-                s.push(i++);
-            }
-            else
-            {
-                int curr = s.top();
-                s.pop();
-                res = std::max(res,heights[curr] * (s.empty() ? i : i - s.top() - 1));
-            }
-        }
-        return res;
+		heights.insert(heights.begin(),0);
+		heights.emplace_back(0);
+		std::stack<int> st;
+		st.emplace(0);
+		int res = 0;
+		for(int i = 1;i < heights.size();i++)
+		{
+			if(heights[i] > heights[st.top()])
+				st.emplace(i);
+			else if(heights[i] == heights[st.top()])
+			{
+				st.pop();
+				st.emplace(i);
+			}
+			else
+			{
+				while(!st.empty() && heights[st.top()] > heights[i])
+				{
+					int mid = st.top();
+					st.pop();
+					if(!st.empty())
+					{
+						int w = i - st.top()-1;
+						int h = heights[mid];
+						res = std::max(w*h,res);
+					}				
+				}
+				st.emplace(i);
+			}
+		}
+		return res;
     }
 };
 ```
@@ -285,23 +305,38 @@ public:
 class Solution {
 public:
     int trap(vector<int>& height) {
-        int res = 0;
-        std::stack<int> s;
-        for(int i=0;i < height.size();++i)
-        {
-            while(!s.empty() && height[s.top()] < height[i])
-            {
-                int curr = s.top();
-                s.pop();
-                if(s.empty())
-                    break;
-                int left = s.top(),right = i;
-                int h = min(height[left],height[right])-height[curr];
-                res += (right - left - 1) * h;
-            }
-            s.push(i);
-        }
-        return res;        
+		int n = height.size();
+		if(n <= 2)
+			return 0;
+		int res = 0;
+		std::stack<int> st;
+		st.emplace(0);
+		for(int i = 1;i < n;i++)
+		{
+			if(height[i] < height[st.top()])
+				st.emplace(i);
+			else if(height[i] ==  height[st.top()])
+			{
+				st.pop();
+				st.emplace(i);
+			}
+			else
+			{
+				while(!st.empty() && height[i] > height[st.top()])
+				{
+					int mid = st.top();
+					st.pop();
+					if(!st.empty())
+					{
+						int h = std::min(height[st.top()],height[i])-height[mid];
+						int w = i - st.top() - 1;
+						res += w*h;
+					}
+				}
+				st.emplace(i);  
+			}	
+		}
+		return res;
     }
 };
 ```
