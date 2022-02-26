@@ -77,10 +77,8 @@ int search(std::vector<int> nums,int target)
 
 # 动态规划
 
-- [19. 正则表达式匹配](https://leetcode-cn.com/problems/zheng-ze-biao-da-shi-pi-pei-lcof/)
 - [46. 把数字翻译成字符串](https://leetcode-cn.com/problems/ba-shu-zi-fan-yi-cheng-zi-fu-chuan-lcof/)
 - [91. 解码方法](https://leetcode-cn.com/problems/decode-ways/)
-- [48. 最长不含重复字符的子字符串](https://leetcode-cn.com/problems/zui-chang-bu-han-zhong-fu-zi-fu-de-zi-zi-fu-chuan-lcof/)
 - [139. 单词拆分](https://leetcode-cn.com/problems/word-break/)
 - [343. 整数拆分](https://leetcode-cn.com/problems/integer-break/)
 - [49. 丑数](https://leetcode-cn.com/problems/chou-shu-lcof/)
@@ -93,9 +91,11 @@ int search(std::vector<int> nums,int target)
 - [714. 买卖股票的最佳时机含手续费](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/)
 - [416. 分割等和子集](https://leetcode-cn.com/problems/partition-equal-subset-sum/)
 - [322. 零钱兑换](https://leetcode-cn.com/problems/coin-change/)
+- [48. 最长不含重复字符的子字符串](https://leetcode-cn.com/problems/zui-chang-bu-han-zhong-fu-zi-fu-de-zi-zi-fu-chuan-lcof/)
 - [5. 最长回文子串](https://leetcode-cn.com/problems/longest-palindromic-substring/)
 - [300. 最长递增子序列](https://leetcode-cn.com/problems/longest-increasing-subsequence/)
 - [1143. 最长公共子序列](https://leetcode-cn.com/problems/longest-common-subsequence/)
+- [19. 正则表达式匹配](https://leetcode-cn.com/problems/zheng-ze-biao-da-shi-pi-pei-lcof/)
 
 
 # 贪心

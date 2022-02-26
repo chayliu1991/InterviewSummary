@@ -120,14 +120,15 @@ public:
         if(len < 2) 
             return len;
 
-        std::vector<int> dp(len+1);
-        dp[1] = 1;
+        std::vector<int> dp(len);       
         dp[0] = 1;
-        for(int i = 2;i <= len;i++)
-        {
-            dp[i] = dp[i-1];
-            if(str.substr(i-2,2) <= "25" && str.substr(i-2,2) >= "10") 
-                dp[i] = dp[i-2]+dp[i-1];
+        dp[1] = ((str.substr(0,2) >= "10" && str.substr(0,2) <= "25") ? 2 : 1);
+        for(int i = 2;i < len;i++)
+        {           
+            if(str.substr(i-1,2) >= "10" && str.substr(i-1,2) <= "25")
+                dp[i] = dp[i-1] + dp[i-2];     
+            else
+                dp[i] = dp[i-1];
         }
         return dp.back();
     }
