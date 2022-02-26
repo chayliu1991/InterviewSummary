@@ -223,31 +223,36 @@ public:
 class Solution {
 public:
     bool search(vector<int>& nums, int target) {
-		int left = 0,right = nums.size()-1;
-		while(left <= right)
-		{
-			int mid = left + (right - left)/2;
-			if(nums[mid] == target)
-				return true;
-			if(nums[left] == nums[mid] && nums[right] == nums[mid])
-				left ++,right--;
-				
-			else if(nums[mid] >= nums[left])
-			{
-				if(target >= nums[left] && target < nums[mid])
-					right = mid - 1;
-				else
-					left = mid + 1;
-			}
-			else
-			{
-				if(target > nums[mid] && target <= nums[right])
-					left = mid +1;
-				else
-					right = mid -1;
-			}		
-		}
-		return false;
+        int left = 0,right = nums.size()-1;
+        while(left <= right)
+        {
+            int mid = left + (right-left)/2;
+            if(nums[mid] == target)
+                return true;
+            
+            if(nums[mid] == nums[left] && nums[mid] == nums[right])
+            {
+                left++;
+                right--;
+                continue;
+            }
+
+            if(nums[mid] >= nums[left])
+            {
+                if(target >= nums[left] && target <= nums[mid])
+                    right = mid - 1;
+                else    
+                    left = mid + 1;
+            }
+            else
+            {
+                if(target >= nums[mid] && target <= nums[right])
+                    left = mid + 1;
+                else    
+                    right = mid - 1;
+            }
+        }
+        return false;
     }
 };
 ```
@@ -306,27 +311,106 @@ public:
 class Solution {
 public:
     bool searchMatrix(vector<vector<int>>& matrix, int target) {
-		if(matrix.empty() || matrix[0].empty())
-			return false;		
-		int rows = matrix.size(),cols = matrix[0].size();
-		int left = 0,right = rows * cols - 1;
-		while(left <= right)
-		{
-			int mid = left + (right - left) / 2;
-			int value = matrix[mid/cols][mid%cols];
-			if(value == target)
-				return true;
-			else if(value > target)
-				right = mid - 1;
-			else
-				left = mid + 1;				
-		}
-		return false;
+        if(matrix.empty() || matrix[0].empty())
+            return false;
+        int rows = matrix.size(),cols = matrix[0].size();
+        int left = 0,right = rows * cols -1;
+        while(left <= right)
+        {
+            int mid = left + (right-left)/2;
+            int curr = matrix[mid/cols][mid%cols];
+            if(curr == target)
+                return true;
+            else if(curr > target)
+                right = mid - 1;
+            else
+                left = mid + 1;
+        }
+        return false;
     }
 };
 ```
 
+# [53 - I. 在排序数组中查找数字 I](https://leetcode-cn.com/problems/zai-pai-xu-shu-zu-zhong-cha-zhao-shu-zi-lcof/)
 
+```
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        int res = 0;
+        for(const auto n : nums)
+        {
+            if(n == target)
+                res++;
+        }
+        return res;
+    }
+};
+```
+
+```
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        if(nums.empty())
+            return 0;
+        int left = 0,right = nums.size() -1;
+        while(left < right)
+        {
+            int mid = (left + right) >> 1;
+            if(nums[mid] >= target)
+                right = mid;
+            else
+                left = mid + 1;
+        }
+
+        if(nums[left] != target)
+            return 0;
+        int begin = left;
+        left = 0,right = nums.size()-1;
+        while(left < right)
+        {
+            int mid = (left + right + 1) >> 1;
+            if(nums[mid] <= target)
+                left = mid;
+            else
+                right = mid -1;
+        }
+        return right - begin + 1;
+    }
+};
+```
+
+# [53 - II. 0～n-1中缺失的数字](https://leetcode-cn.com/problems/que-shi-de-shu-zi-lcof/)
+
+```
+class Solution {
+public:
+    int missingNumber(vector<int>& nums) {
+        int sum = std::accumulate(nums.begin(),nums.end(),0);
+        int expect = (nums.size() * (nums.size()+1)) >> 1;
+        return expect - sum;
+    }
+};
+```
+
+```
+class Solution {
+public:
+    int missingNumber(vector<int>& nums) {
+        int left = 0,right = nums.size();
+        while(left < right)
+        {
+            int mid = (left + right) >> 1;
+            if(nums[mid] == mid)
+                left = mid + 1;
+            else 
+                right = mid;
+        }
+        return left;
+    }
+};
+```
 
 
 
