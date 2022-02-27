@@ -547,22 +547,22 @@ public:
 ```
 class Solution {
 public:
+    int diameterOfBinaryTree(TreeNode* root) {
+        if(root == nullptr)
+            return 0;
+        int res = 0;
+        depth(root,res);
+        return res;
+    }
+
     int depth(TreeNode* root,int& diameter)
     {
         if(root == nullptr)
             return 0;
         int L = depth(root->left,diameter);
         int R = depth(root->right,diameter);
-        diameter = std::max(L+R+1,diameter);
-        return max(L,R) + 1;        
-    }
-
-    int diameterOfBinaryTree(TreeNode* root) {
-       	if(root == nullptr)
-		   	return 0;
-		int res = 0;
-        depth(root,res);
-        return res -1 ;
+        diameter = std::max(diameter,L+R);
+        return std::max(L,R) + 1;
     }
 };
 ```
@@ -757,6 +757,29 @@ public:
             if(cur.first->right) stk.push(make_pair(cur.first->right, cur.second + cur.first->right->val));
         }
         return false;
+    }
+};
+```
+
+dfs：
+
+```
+class Solution {
+public:
+    bool hasPathSum(TreeNode* root, int targetSum) {
+        if(root == nullptr)
+            return false;
+        return dfs(root,targetSum,0);
+    }
+
+    bool dfs(TreeNode* root, int targetSum,int curr)
+    {
+        if(root == nullptr)
+            return false;
+        curr += root->val;
+        if(root->left == nullptr && root->right == nullptr && targetSum == curr)
+            return true;        
+        return dfs(root->left,targetSum,curr) || dfs(root->right,targetSum,curr);
     }
 };
 ```
@@ -1205,8 +1228,10 @@ public:
     {
         if(pre_start > pre_end)
             return nullptr;
-		int pos = hash[pre[pre_start]];		
         TreeNode* root = new TreeNode(pre[pre_start]);
+        if(pre_start == pre_end)
+            return root;
+		int pos = hash[pre[pre_start]];		        
         int len = pos - inor_start;
         root->left = build(pre,inor,pre_start+1,pre_start+len,inor_start,pos-1);
         root->right = build(pre,inor,pre_start+1+len,pre_end,pos+1,inor_end);
@@ -1220,26 +1245,25 @@ public:
 ```
 class Solution {
 public:
+    std::unordered_map<int,int> hash;
+
     TreeNode* constructFromPrePost(vector<int>& preorder, vector<int>& postorder) {
-        return build(preorder, postorder, 0, preorder.size()-1, 0, postorder.size()-1);
+         for(int i = 0;i < postorder.size();i++)
+            hash[postorder[i]] = i;
+        return build(preorder,postorder,0,preorder.size()-1,0,postorder.size()-1);
     }
 
-    TreeNode* build(vector<int>& pre, vector<int>& post, int pre_start, int pre_end, int post_start, int post_end) 
-	{
-        if (pre_start > pre_end)
+    TreeNode* build(const vector<int>& preorder, const vector<int>& postorder,int pre_start,int pre_end,int post_start,int post_end)
+    {
+        if(pre_start > pre_end)
             return nullptr;
-        
-        TreeNode* root = new TreeNode(pre[pre_start]);
-        if (pre_start == pre_end)
+        TreeNode* root = new TreeNode(preorder[pre_start]);
+        if(pre_start == pre_end)
             return root;
-       
-        int i = post_start; 
-        while (i < post_end && post[i] != pre[pre_start + 1])
-            i++; 
-        
-        int len = i - post_start + 1;
-        root->left = build(pre, post, pre_start + 1, pre_start + len, post_start, i);
-        root->right = build(pre, post, pre_start + 1 + len, pre_end, i + 1, post_end - 1);
+        int pos = hash[preorder[pre_start+1]];
+        int len = pos - post_start + 1;
+        root->left = build(preorder,postorder,pre_start+1,pre_start+len,post_start,post_start+len-1);
+        root->right = build(preorder,postorder,pre_start+1+len,pre_end,post_start+len,post_end-1);
         return root;
     }
 };
@@ -1263,6 +1287,8 @@ public:
 		if(inor_start > inor_end)
 			return nullptr;
 		TreeNode* root = new TreeNode(post[post_end]);
+        if(inor_start == inor_end)
+            return root;
 		int pos = hash[post[post_end]];
 		int len = pos - inor_start -1;
 		root->left = build(inor,post,inor_start,pos-1,post_start,post_start+len);
