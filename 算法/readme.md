@@ -69,19 +69,19 @@ int search(std::vector<int> nums,int target)
 
 - [53 - I. 在排序数组中查找数字 I](https://leetcode-cn.com/problems/zai-pai-xu-shu-zu-zhong-cha-zhao-shu-zi-lcof/)
 - [53 - II. 0～n-1中缺失的数字](https://leetcode-cn.com/problems/que-shi-de-shu-zi-lcof/)
-- [69. Sqrt(x)](https://leetcode-cn.com/problems/sqrtx/)
+- **[69. Sqrt(x)](https://leetcode-cn.com/problems/sqrtx/)**
 - [33. 搜索旋转排序数组](https://leetcode-cn.com/problems/search-in-rotated-sorted-array/)
-- [81. 搜索旋转排序数组 II](https://leetcode-cn.com/problems/search-in-rotated-sorted-array-ii/)
+- **[81. 搜索旋转排序数组 II](https://leetcode-cn.com/problems/search-in-rotated-sorted-array-ii/)**
 - [74. 搜索二维矩阵](https://leetcode-cn.com/problems/search-a-2d-matrix/)
 
 
 # 动态规划
 
 - [46. 把数字翻译成字符串](https://leetcode-cn.com/problems/ba-shu-zi-fan-yi-cheng-zi-fu-chuan-lcof/)
-- [91. 解码方法](https://leetcode-cn.com/problems/decode-ways/)
+- **[91. 解码方法](https://leetcode-cn.com/problems/decode-ways/)**
 - [139. 单词拆分](https://leetcode-cn.com/problems/word-break/)
 - [343. 整数拆分](https://leetcode-cn.com/problems/integer-break/)
-- [49. 丑数](https://leetcode-cn.com/problems/chou-shu-lcof/)
+- **[49. 丑数](https://leetcode-cn.com/problems/chou-shu-lcof/)**
 - [60. n个骰子的点数](https://leetcode-cn.com/problems/nge-tou-zi-de-dian-shu-lcof/)
 - [120. 三角形最小路径和](https://leetcode-cn.com/problems/triangle/)
 - [279. 完全平方数](https://leetcode-cn.com/problems/perfect-squares/)
@@ -89,21 +89,21 @@ int search(std::vector<int> nums,int target)
 - [188. 买卖股票的最佳时机 IV](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iv/)
 - [309. 最佳买卖股票时机含冷冻期](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/)
 - [714. 买卖股票的最佳时机含手续费](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/)
-- [416. 分割等和子集](https://leetcode-cn.com/problems/partition-equal-subset-sum/)
-- [322. 零钱兑换](https://leetcode-cn.com/problems/coin-change/)
+- **[416. 分割等和子集](https://leetcode-cn.com/problems/partition-equal-subset-sum/)**
+- **[322. 零钱兑换](https://leetcode-cn.com/problems/coin-change/)**
 - [48. 最长不含重复字符的子字符串](https://leetcode-cn.com/problems/zui-chang-bu-han-zhong-fu-zi-fu-de-zi-zi-fu-chuan-lcof/)
 - [5. 最长回文子串](https://leetcode-cn.com/problems/longest-palindromic-substring/)
-- [300. 最长递增子序列](https://leetcode-cn.com/problems/longest-increasing-subsequence/)
-- [1143. 最长公共子序列](https://leetcode-cn.com/problems/longest-common-subsequence/)
+- **[300. 最长递增子序列](https://leetcode-cn.com/problems/longest-increasing-subsequence/)**
+- **[1143. 最长公共子序列](https://leetcode-cn.com/problems/longest-common-subsequence/)**
 - [19. 正则表达式匹配](https://leetcode-cn.com/problems/zheng-ze-biao-da-shi-pi-pei-lcof/)
 
 
 # 贪心
 
 - [376. 摆动序列](https://leetcode-cn.com/problems/wiggle-subsequence/)
-- [406. 根据身高重建队列](https://leetcode-cn.com/problems/queue-reconstruction-by-height/)
+- **[406. 根据身高重建队列](https://leetcode-cn.com/problems/queue-reconstruction-by-height/)**
 - [134. 加油站](https://leetcode-cn.com/problems/gas-station/)
-- [55. 跳跃游戏](https://leetcode-cn.com/problems/jump-game/)
+- **[55. 跳跃游戏](https://leetcode-cn.com/problems/jump-game/)**
 - [135. 分发糖果](https://leetcode-cn.com/problems/candy/)
 
 
@@ -111,22 +111,22 @@ int search(std::vector<int> nums,int target)
 
 - [103. 二叉树的锯齿形层序遍历](https://leetcode-cn.com/problems/binary-tree-zigzag-level-order-traversal/)
 - [538. 把二叉搜索树转换为累加树](https://leetcode-cn.com/problems/convert-bst-to-greater-tree/)
-- [543. 二叉树的直径](https://leetcode-cn.com/problems/diameter-of-binary-tree/)
+- **[543. 二叉树的直径](https://leetcode-cn.com/problems/diameter-of-binary-tree/)**
 - [897. 递增顺序查找树](https://leetcode-cn.com/problems/increasing-order-search-tree/)
-- [235. 二叉搜索树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-search-tree/)
-- [236. 二叉树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-tree/)
+- **[235. 二叉搜索树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-search-tree/)**
+- **[236. 二叉树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-tree/)**
 - [112. 路径总和](https://leetcode-cn.com/problems/path-sum/)
-- [113. 路径总和 II](https://leetcode-cn.com/problems/path-sum-ii/)
+- **[113. 路径总和 II](https://leetcode-cn.com/problems/path-sum-ii/)**
 - [226. 翻转二叉树](https://leetcode-cn.com/problems/invert-binary-tree/)
-- [617. 合并二叉树](https://leetcode-cn.com/problems/merge-two-binary-trees/)
+- **[617. 合并二叉树](https://leetcode-cn.com/problems/merge-two-binary-trees/)**
 - [572. 另一个树的子树](https://leetcode-cn.com/problems/subtree-of-another-tree/)
 - [26. 树的子结构](https://leetcode-cn.com/problems/shu-de-zi-jie-gou-lcof/)
 - [101. 对称二叉树](https://leetcode-cn.com/problems/symmetric-tree/)
 - [109. 有序链表转换二叉搜索树](https://leetcode-cn.com/problems/convert-sorted-list-to-binary-search-tree/)
-- [958. 二叉树的完全性检验](https://leetcode-cn.com/problems/check-completeness-of-a-binary-tree/)
+- **[958. 二叉树的完全性检验](https://leetcode-cn.com/problems/check-completeness-of-a-binary-tree/)**
 - [105. 从前序与中序遍历序列构造二叉树](https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/)
 - [106. 从中序与后序遍历序列构造二叉树](https://leetcode-cn.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/)
-- [889. 根据前序和后序遍历构造二叉树](https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-postorder-traversal/)
+- **[889. 根据前序和后序遍历构造二叉树](https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-postorder-traversal/)**
 - [37. 序列化二叉树](https://leetcode-cn.com/problems/xu-lie-hua-er-cha-shu-lcof/)
 
 # 链表
@@ -248,14 +248,13 @@ while (l2 != NULL && l2->next!= NULL) {
 # 搜索与回溯
 
 BFS 需要借助队列完成。
-- [547. 省份数量](https://leetcode-cn.com/problems/number-of-provinces/)
-- [46. 全排列](https://leetcode-cn.com/problems/permutations/)
+- **[547. 省份数量](https://leetcode-cn.com/problems/number-of-provinces/)**
 - [200. 岛屿数量](https://leetcode-cn.com/problems/number-of-islands/)
 - [463. 岛屿的周长](https://leetcode-cn.com/problems/island-perimeter/)
 - [22. 括号生成](https://leetcode-cn.com/problems/generate-parentheses/)
 - [12. 矩阵中的路径](https://leetcode-cn.com/problems/ju-zhen-zhong-de-lu-jing-lcof/)
 - [38. 字符串的排列](https://leetcode-cn.com/problems/zi-fu-chuan-de-pai-lie-lcof/)
-- [46. 全排列](https://leetcode-cn.com/problems/permutations/)
+- **[46. 全排列](https://leetcode-cn.com/problems/permutations/)**
 - [78. 子集](https://leetcode-cn.com/problems/subsets/)
 - [77. 组合](https://leetcode-cn.com/problems/combinations/)
 

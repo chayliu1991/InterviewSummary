@@ -68,6 +68,8 @@ int BFS(start,target){
 
 # 回溯模板
 
+**DFS 不需要回复状态，回溯需要恢复状态。**
+
 ```
 vector<vector<string>> result;
 vector<string> path; 
@@ -92,32 +94,32 @@ void backtrace(参数) {
 class Solution {
 public:
     int findCircleNum(vector<vector<int>>& isConnected) {
-		if(isConnected.empty())
-			return 0;
-		int n = isConnected.size();
-		int res = 0;
-		std::queue<int> q;
-		std::vector<bool> visited(n);
-		for(int i = 0;i < n;i++)
-		{
-			if(!visited[i])
-			{
-				res ++;
-				q.push(i);
-				while(!q.empty())
-				{
-					int city = q.front();
-					q.pop();
-					visited[city] = true;
-					for(int k = 0;k < n;k++)
-					{
-						if(isConnected[city][k] == 1 && !visited[k])
-							q.push(k);
-					}
-				}
-			}
-		}
-		return res;
+        if(isConnected.empty())
+            return 0;
+        int n = isConnected.size();
+        int res = 0;
+        std::vector<bool> visited(n);
+        for(int i = 0;i < n;i++)
+        {
+            if(!visited[i])
+            {
+                res++;
+                std::queue<int> q;
+                q.emplace(i);
+                while(!q.empty())
+                {
+                    auto city = q.front();
+                    q.pop();
+                    visited[city] = true;
+                    for(int j = 0;j < n;j++)
+                    {
+                        if(isConnected[city][j] == 1 && !visited[j])
+                            q.emplace(j);
+                    }
+                }
+            }
+        }
+        return res; 
     }
 };
 ```
@@ -126,33 +128,34 @@ public:
 class Solution {
 public:
     int findCircleNum(vector<vector<int>>& isConnected) {
-		if(isConnected.empty())
-			return 0;
-		int res = 0;
-		int n = isConnected.size();
-		std::vector<bool> visited(n);
-		for(int i = 0;i < n;i++)
-		{
-			if(!visited[i])
-			{
-				res ++;
-				dfs(isConnected,visited,n,i);
-			}
-		}		
-		return res;
+         if(isConnected.empty())
+            return 0;
+        int n = isConnected.size();
+        int res = 0;
+        std::vector<bool> visited(n);
+        for(int i = 0;i < n;i++)
+        {
+            if(!visited[i])
+            {
+                res++;
+                dfs(isConnected,visited,i);
+            }
+        }
+        return res;
     }
-	
-	void dfs(const vector<vector<int>>& isConnected,std::vector<bool>& visited,int n ,int i)
-	{
-		for(int j = 0;j < n;j++)
-		{
-			if(isConnected[i][j] && !visited[j])
-			{
-				visited[j] = true;
-				dfs(isConnected,visited,n,j);
-			}
-		}
-	}
+
+    void dfs(vector<vector<int>>& isConnected,std::vector<bool> &visited,int curr)
+    {
+        int n = isConnected.size();
+        for(int i = 0;i < n;i++)
+        {
+            if(isConnected[curr][i] && !visited[i])
+            {
+                visited[i] = true;
+                dfs(isConnected,visited,i);
+            }
+        }
+    }
 };
 ```
 
@@ -530,29 +533,30 @@ public:
 ```
 class Solution {
 public:
-	vector<vector<int>> res;
-	vector<int> path;
-	
-	void backtrace(int n, int k,int curr_index)
-	{	
-		if(path.size() == k)
-		{
-			res.push_back(path);
-			return;
-		}
-		
-		for(int i = curr_index;i <= n;i++)
-		{
-			path.push_back(i);
-			backtrace(n,k,i+1);
-			path.pop_back();
-		}
-	}
-		
     vector<vector<int>> combine(int n, int k) {
-		backtrace(n,k,1);
-		return res;
+        vector<vector<int>> res;
+        vector<int> path;
+        backtrack(n,k,res,path,1);
+        return res;
     }
+
+    void backtrack(int n, int k,vector<vector<int>>& res, vector<int>& path,int curr)
+    {
+        if(path.size() > k)
+            return;
+        if(path.size() == k){
+            res.emplace_back(path);
+            return;
+        }
+        
+        for(int i = curr;i <= n;i++)
+        {
+            path.emplace_back(i);
+            backtrack(n,k,res,path,i+1);
+            path.pop_back();
+        }
+    }
+
 };
 ```
 
@@ -561,24 +565,28 @@ public:
 ```
 class Solution {
 public:
-	vector<vector<int>> res;
-	vector<int> path;
-	
-	void backtrace(vector<int>& nums,int curr_index)
-	{
-		res.push_back(path);
-		for(int i = curr_index;i < nums.size();i++)
-		{
-			path.push_back(nums[i]);
-			backtrace(nums,i+1);
-			path.pop_back();
-		}		
-	}
-	
     vector<vector<int>> subsets(vector<int>& nums) {
-		backtrace(nums,0);
-		return res;
+        if(nums.empty())
+            return {};
+        vector<int> path;
+        vector<vector<int>> res;
+        backtrack(nums,res,path,0);
+        return res;
     }
+
+    void backtrack(vector<int>& nums,vector<vector<int>>& res,vector<int>& path,int curr)
+    {
+        if(curr > nums.size())
+            return;
+        res.emplace_back(path);
+        for(int i = curr;i < nums.size();i++)
+        {
+            path.emplace_back(nums[i]);
+            backtrack(nums,res,path,i+1);
+            path.pop_back();
+        }
+    }
+    
 };
 ```
 
