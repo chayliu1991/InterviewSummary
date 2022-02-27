@@ -195,8 +195,6 @@ while (l2 != NULL && l2->next!= NULL) {
 
 - [19. 删除链表的倒数第 N 个结点](https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list/)
 
-- [203. 移除链表元素](https://leetcode-cn.com/problems/remove-linked-list-elements/)
-
 - [142. 环形链表 II](https://leetcode-cn.com/problems/linked-list-cycle-ii/)
 
 - [160. 相交链表](https://leetcode-cn.com/problems/intersection-of-two-linked-lists/)

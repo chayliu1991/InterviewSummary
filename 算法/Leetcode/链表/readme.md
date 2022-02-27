@@ -26,23 +26,27 @@ public:
 class Solution {
 public:
     ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
-        ListNode dummy(-1);
-        ListNode* curr = &dummy;
+        if(l1 == nullptr)
+            return l2;
+        if(l2 == nullptr)
+            return nullptr;
         int carry = 0;
-        
-         for(ListNode *p1 =l1,*p2 = l2;p1 || p2 || carry;)
+        ListNode* dummy = new ListNode(-1);
+        ListNode* curr = dummy;
+        while(l1 || l2 || carry)
         {
-            int v1 = (p1 == nullptr ? 0 : p1->val);
-            int v2 = (p2 == nullptr ? 0 : p2->val);
-            int sum = v1 + v2 + carry;
-            carry = sum/10;
-            ListNode* node = new ListNode(sum%10);
+            int v1 = l1 == nullptr ? 0 : l1->val;
+            int v2 = l2 == nullptr ? 0 : l2->val;
+            l1 = l1 == nullptr ? nullptr : l1->next;
+            l2 = l2 == nullptr ? nullptr : l2->next;
+
+            int tmp = v1 + v2 + carry;
+            carry = tmp /10;
+            ListNode* node = new ListNode(tmp%10);
             curr->next = node;
-            curr = curr->next;
-            p1 = (p1 == nullptr ? nullptr : p1->next);
-            p2 = (p2 == nullptr ? nullptr : p2->next);
+            curr = curr->next;            
         }
-        return dummy.next;
+        return dummy->next;
     }
 };
 ```
@@ -86,26 +90,27 @@ public:
 class Solution {
 public:
     ListNode* partition(ListNode* head, int x) {
-        ListNode node1(-1),node2(-1);
-        ListNode* hsmall = &node1,*hbig = &node2;
-        ListNode* curr_small = hsmall,*curr_big = hbig,*curr = head;
+        if(head == nullptr)
+            return head;
+        ListNode* h_big = new ListNode(-1),*h_small = new ListNode(-1);
+        ListNode* curr = head,*curr_big = h_big,*curr_small = h_small;
         while(curr)
         {
-            if(curr->val < x)
+            if(curr->val >= x)
             {
-				curr_small->next = curr;
-                curr_small = curr_small->next;
+                curr_big->next = curr;
+                curr_big = curr_big->next;
             }
             else
             {
-                curr_big->next = curr;
-                curr_big = curr_big->next; 
+                curr_small->next = curr;
+                curr_small = curr_small->next;
             }
             curr = curr->next;
         }
         curr_big->next = nullptr;
-        curr_small->next = hbig->next;
-        return hsmall->next;
+        curr_small->next = h_big->next;
+        return h_small->next;
     }
 };
 ```
@@ -131,6 +136,37 @@ public:
         }
         odd->next = even_head;
         return head;
+    }
+};
+```
+
+```
+class Solution {
+public:
+    ListNode* oddEvenList(ListNode* head) {
+        if(head == nullptr)
+            return head;
+        ListNode* h_even = new ListNode(-1),*h_odd = new ListNode(-1);
+        ListNode* p = head,*curr_even = h_even,*curr_odd = h_odd;
+        bool even = true;
+        while(p)
+        {
+            if(even)
+            {
+                curr_even->next = p;
+                curr_even = curr_even->next;
+            }
+            else
+            {
+                curr_odd->next = p;
+                curr_odd = curr_odd->next;
+            }
+            even = !even;
+            p = p->next;
+        }
+        curr_odd->next = nullptr;
+        curr_even->next = h_odd->next;
+        return h_even->next;
     }
 };
 ```
@@ -209,12 +245,16 @@ public:
 class Solution {
 public:
     ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
-        ListNode dummy(-1);
-        ListNode* curr = &dummy;
+        if(list1 == nullptr)
+            return list2;
+        if(list2 == nullptr)
+            return list1;
+        ListNode* dummy = new ListNode(-1);
+        ListNode* curr = dummy;
         while(list1 && list2)
         {
             if(list1->val <= list2->val)
-            {
+            {   
                 curr->next = list1;
                 list1 = list1->next;
             }
@@ -225,8 +265,8 @@ public:
             }
             curr = curr->next;
         }
-        curr->next = list1 ? list1 : list2;
-        return dummy.next;
+       curr->next = list1 == nullptr ? list2 : list1;
+       return dummy->next;
     }
 };
 ```
@@ -237,13 +277,32 @@ public:
 class Solution {
 public:
     ListNode* swapPairs(ListNode* head) {
-        if (head == nullptr || head->next == nullptr) {
+        if(head == nullptr || head->next == nullptr)
             return head;
-        }
         ListNode* new_head = head->next;
         head->next = swapPairs(new_head->next);
         new_head->next = head;
         return new_head;
+    }
+};
+```
+
+```
+class Solution {
+public:
+    ListNode* swapPairs(ListNode* head) {
+        ListNode* dummy = new ListNode(-1,head);
+        ListNode* curr = dummy;
+        while(curr->next && curr->next->next)
+        {
+            ListNode* node1 = curr->next;
+            ListNode* node2 = curr->next->next;
+            curr->next = node2;
+            node1->next = node2->next;
+            node2->next = node1;
+            curr = node1;
+        }
+        return dummy->next;
     }
 };
 ```
@@ -344,22 +403,39 @@ public:
 class Solution {
 public:
     ListNode* deleteDuplicates(ListNode* head) {
-        if(head == nullptr || head->next == nullptr)
-            return head;
         ListNode* dummy = new ListNode(-1,head);
-        ListNode* curr = dummy;
-        while(curr->next && curr->next->next)
+        ListNode* curr = head,*prev = dummy;
+        while(curr)
         {
-            if(curr->next->val == curr->next->next->val)
-            {
-                int x = curr->next->val;
-                while(curr->next && curr->next->val == x)
-                  curr->next = curr->next->next;
-            }
-            else
+            while(curr->next && curr->val == curr->next->val)
                 curr = curr->next;
+            if(prev->next != curr)
+                prev->next = curr->next;
+            else
+                prev = prev->next;
+            curr = curr->next;
         }
         return dummy->next;
+    }
+};
+```
+
+```
+class Solution {
+public:
+    ListNode* deleteDuplicates(ListNode* head) {
+        if(head == nullptr || head->next == nullptr)
+            return head;
+        if(head->val != head->next->val)
+            head->next = deleteDuplicates(head->next);
+        else
+        {
+            ListNode* move = head->next;
+            while(move && head->val == move->val)
+                move = move->next;
+            return deleteDuplicates(move);
+        }
+        return head;
     }
 };
 ```
@@ -370,16 +446,39 @@ public:
 class Solution {
 public:
     ListNode* deleteDuplicates(ListNode* head) {
-        if (head == nullptr || head->next == nullptr) 
+        if(head == nullptr || head->next == nullptr)
             return head;
-
+            
         ListNode* curr = head;
-        while (curr->next) 
+        while(curr->next)
         {
-            if (curr->val == curr->next->val)
+            if(curr->val == curr->next->val)
                 curr->next = curr->next->next;
             else
                 curr = curr->next;
+        }
+        return head;
+    }
+};
+```
+
+```
+class Solution {
+public:
+    ListNode* deleteDuplicates(ListNode* head) {
+        if(head == nullptr || head->next == nullptr)
+            return head;
+        if(head->val != head->next->val)
+            head->next = deleteDuplicates(head->next);
+        else
+        {
+            ListNode* move = head->next;
+            ListNode* prev = head;
+            while(move && move->val == head->val){
+                move = move->next;
+                prev = prev->next;
+            }
+            return deleteDuplicates(prev);            
         }
         return head;
     }
@@ -392,24 +491,18 @@ public:
 class Solution {
 public:
     ListNode* removeNthFromEnd(ListNode* head, int n) {
-        ListNode* fast = head;
-        while(n--)
-        {
-            if(fast == nullptr)
-                return nullptr;
+        ListNode* fast = head,*slow = head;
+        while(fast && n--)
             fast = fast->next;
-        }
-
+        
         if(fast == nullptr)
             return head->next;
-
-        ListNode* slow = head;
+        
         while(fast->next)
         {
-            slow = slow->next;
             fast = fast->next;
+            slow = slow->next;
         }
-
         slow->next = slow->next->next;
         return head;
     }
@@ -513,33 +606,35 @@ public:
 ```
 class LRUCache {
 public:
-    int cap_{0};
-    std::list<std::pair<int,int>>  reords_;
+    int cap_;
+    std::list<std::pair<int,int>> data_;
     using Iter = std::list<std::pair<int,int>>::iterator;
-    std::unordered_map<int,Iter> hash_;
+    std::unordered_map<int,Iter> dict_;
 
     LRUCache(int capacity) : cap_(capacity){
     }
     
     int get(int key) {
-        if(hash_.find(key) == hash_.end())
+        if(dict_.find(key) == dict_.end())
             return -1;
-        int res = hash_[key]->second;
-        reords_.erase(hash_[key]);
-        reords_.push_front({key,res});
-        hash_[key] = reords_.begin();
+        int res = dict_[key]->second;
+        data_.erase(dict_[key]);
+        data_.emplace_front(key,res);
+        dict_[key] = data_.begin();
         return res;
     }
     
     void put(int key, int value) {
-        if(hash_.find(key) != hash_.end())
-            reords_.erase(hash_[key]);
-        reords_.push_front({key,value});
-        hash_[key] = reords_.begin();
-        if(reords_.size() > cap_)
+        if(dict_.find(key) != dict_.end())
+            data_.erase(dict_[key]);          
+        
+        data_.emplace_front(key,value);
+        dict_[key] = data_.begin();
+
+        while(data_.size() > cap_)
         {
-            hash_.erase(reords_.back().first);
-            reords_.pop_back();
+            dict_.erase(data_.back().first);
+            data_.pop_back();
         }
     }
 };
