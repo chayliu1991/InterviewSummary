@@ -465,40 +465,44 @@ public:
 ```
 class Solution {
 public:
+    std::vector<std::vector<bool>> Visited;
+
     int islandPerimeter(vector<vector<int>>& grid) {
-		if(grid.empty() || grid[0].empty())
-			return 0;
-		int rows = grid.size(),cols = grid[0].size();
-		int res = 0;
-		for(int i = 0;i < rows;i++)
-		{
-			for(int j = 0;j < cols;j++)
-			{
-				if(grid[i][j] == 1)
-					res += dfs(grid,i,j);				
-			}
-		}		
-		return res;
+        if(grid.empty())
+            return 0;
+        int rows = grid.size(),cols = grid[0].size();
+        Visited = std::vector<std::vector<bool>> (rows,std::vector<bool>(cols));
+
+        int res = 0;
+        for(int i = 0;i < rows;i++)
+        {
+            for(int j = 0;j < cols;j++)
+            {
+                if(grid[i][j] == 1 && !Visited[i][j])
+                    res += dfs(grid,rows,cols,i,j);
+            }
+        }
+        return res;
     }
-	
-	int dfs(vector<vector<int>>& grid,int i,int j)
-	{
-		if(i < 0 || j < 0 || i >= grid.size() || j >= grid[0].size() || grid[i][j] == 0)
-			return 1;
-		
-		if(grid[i][j] == INT_MAX)
-			return 0;
-		
-		grid[i][j] = INT_MAX;
-		int count = 0;
-		int dx[] = {0,1,-1,0},dy[] = {1,0,0,-1};
-		for(int k = 0;k < 4;k++)
-		{
-			int x = dx[k] + i,y = dy[k] + j;
-			count += dfs(grid,x,y);
-		}
-		return count;
-	}
+
+    int dfs(vector<vector<int>>& grid,int rows,int cols,int i,int j)
+    {
+        if(i < 0 || j < 0 || i >= rows || j >= cols || grid[i][j] == 0)
+            return 1;
+        if(Visited[i][j])
+            return 0;
+        Visited[i][j] = true;
+
+        int res  = 0;
+        int dx[] = {1,0,-1,0},dy[] = {0,1,0,-1};
+        for(int k = 0;k < 4;k++)
+        {
+            int x = dx[k] + i,y =dy[k]+j;
+            res += dfs(grid,rows,cols,x,y);
+        }
+
+        return res;
+    }
 };
 ```
 
@@ -697,43 +701,48 @@ public:
 };
 ```
 
-# [79. 单词搜索](https://leetcode-cn.com/problems/word-search/)
+# [12. 矩阵中的路径](https://leetcode-cn.com/problems/ju-zhen-zhong-de-lu-jing-lcof/)
 
 ```
 class Solution {
 public:
     bool exist(vector<vector<char>>& board, string word) {
-        if(board.empty() || board[0].empty())
+        if(board.empty() || word.empty())
             return false;
-        for(int i = 0;i < board.size();i++)
+        int rows = board.size(),cols = board[0].size();
+        for(int i = 0;i < rows;i++)
         {
-            for(int j = 0;j < board[0].size();j++)
+            for(int j = 0;j < cols;j++)
             {
-                if(board[i][j] == word[0] && backtrack(board,word,i,j,0))
-                    return true;
+                if(board[i][j] == word[0])
+                {
+                    if(backtrack(board,word,rows,cols,0,i,j))
+                        return true;
+                }
             }
         }
         return false;
     }
 
-    bool backtrack(vector<vector<char>>& board, string word,int i,int j,int curr)
+    bool backtrack(vector<vector<char>>& board,string word,int rows,int cols,int len,int i,int j)
     {
-        if(i < 0 || j < 0 || i >= board.size() || j >= board[i].size() || board[i][j] != word[curr])
+        if(i < 0 || i >= rows || j < 0 || j >= cols || board[i][j] != word[len])
             return false;
-        if(curr == word.length()-1)
+
+        if(len == word.length()-1)
             return true;
-        int dx[] = {1,0,-1,0},dy[] = {0,-1,0,1};
+
         char tmp = board[i][j];
-        board[i][j] = '.';
+        board[i][j] = '\0';
+        int dx[] = {1,0,-1,0},dy[] = {0,1,0,-1};
         for(int k = 0;k < 4;k++)
         {
             int x = dx[k] + i,y = dy[k] + j;
-            if(backtrack(board,word,x,y,curr + 1))
+            if(backtrack(board,word,rows,cols,len+1,x,y))
                 return true;
         }
-        board[i][j] = tmp;
+        board[i][j]  = tmp;
         return false;
     }
 };
 ```
-
