@@ -306,8 +306,6 @@ class Solution {
 public:
     int trap(vector<int>& height) {
 		int n = height.size();
-		if(n <= 2)
-			return 0;
 		int res = 0;
 		std::stack<int> st;
 		st.emplace(0);
