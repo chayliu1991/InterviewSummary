@@ -244,29 +244,18 @@ public:
 ```
 class Solution {
 public:
-    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
-        if(list1 == nullptr)
-            return list2;
-        if(list2 == nullptr)
-            return list1;
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
         ListNode* dummy = new ListNode(-1);
-        ListNode* curr = dummy;
-        while(list1 && list2)
-        {
-            if(list1->val <= list2->val)
-            {   
-                curr->next = list1;
-                list1 = list1->next;
-            }
-            else
-            {
-                curr->next = list2;
-                list2 = list2->next;
-            }
-            curr = curr->next;
-        }
-       curr->next = list1 == nullptr ? list2 : list1;
-       return dummy->next;
+		ListNode* curr = dummy;
+		while(l1 && l2)
+		{
+			auto &node = l1->val <= l2->val ? l1 : l2;
+			curr->next = node;      
+			curr = curr->next;
+			node = node->next;			
+		}
+		curr->next = l1 == nullptr ? l2 : l1;
+		return dummy->next;
     }
 };
 ```
@@ -403,6 +392,26 @@ public:
 class Solution {
 public:
     ListNode* deleteDuplicates(ListNode* head) {
+		if(head == nullptr || head->next == nullptr)
+			return head;
+		ListNode* curr = head;
+		while(curr && curr->next)
+		{
+			if(curr->val != curr->next->val)
+				curr = curr->next;
+			else{
+				curr->next = curr->next->next;
+			}
+		}
+		return head;
+    }
+};
+```
+
+```
+class Solution {
+public:
+    ListNode* deleteDuplicates(ListNode* head) {
         ListNode* dummy = new ListNode(-1,head);
         ListNode* curr = head,*prev = dummy;
         while(curr)
@@ -431,9 +440,12 @@ public:
         else
         {
             ListNode* move = head->next;
-            while(move && head->val == move->val)
+            ListNode* prev = head;
+            while(move && move->val == head->val){
                 move = move->next;
-            return deleteDuplicates(move);
+                prev = prev->next;
+            }
+            return deleteDuplicates(prev);            
         }
         return head;
     }
@@ -473,12 +485,9 @@ public:
         else
         {
             ListNode* move = head->next;
-            ListNode* prev = head;
-            while(move && move->val == head->val){
+            while(move && head->val == move->val)
                 move = move->next;
-                prev = prev->next;
-            }
-            return deleteDuplicates(prev);            
+            return deleteDuplicates(move);
         }
         return head;
     }
@@ -491,20 +500,23 @@ public:
 class Solution {
 public:
     ListNode* removeNthFromEnd(ListNode* head, int n) {
-        ListNode* fast = head,*slow = head;
-        while(fast && n--)
-            fast = fast->next;
-        
-        if(fast == nullptr)
-            return head->next;
-        
-        while(fast->next)
-        {
-            fast = fast->next;
-            slow = slow->next;
-        }
-        slow->next = slow->next->next;
-        return head;
+		ListNode* fast = head;
+		while(n--)
+		{
+			if(fast == nullptr)
+				return nullptr;
+			fast = fast->next;
+		}
+		if(fast == nullptr)
+			return head->next;
+		ListNode* slow = head;
+		while(fast->next)
+		{
+			fast = fast->next;
+			slow = slow->next;
+		}
+		slow->next = slow->next->next;
+		return head;
     }
 };
 ```
