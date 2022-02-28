@@ -134,5 +134,29 @@ public:
 };
 ```
 
+# [11. 盛最多水的容器](https://leetcode-cn.com/problems/container-with-most-water/)
+
+```
+class Solution {
+public:
+    int maxArea(vector<int>& height) {
+        if(height.empty())
+            return 0;
+        int left = 0,right = height.size()-1;
+        int res = 0;
+        while(left < right)
+        {
+            int curr = std::min(height[right],height[left]) * (right-left);
+            res = std::max(res,curr);
+            if(height[right] < height[left]) 
+                right --;
+            else
+                left++;
+        }
+        return res;
+    }
+};
+```
+
 
 

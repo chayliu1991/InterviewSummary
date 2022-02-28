@@ -165,26 +165,29 @@ public:
 class Solution {
 public:
     vector<int> dailyTemperatures(vector<int>& temperatures) {
-		int n = temperatures.size();
-		std::vector<int> res(n);
-		std::stack<int> st;  //@ top->bottom is increase
-		st.emplace(0);
-		for(int i = 1;i < n;i++)
-		{
-			auto & curr = temperatures[i];
-			if(curr <= temperatures[st.top()])
-				st.emplace(i);
-			else
-			{
-				while(!st.empty() && curr > temperatures[st.top()])
-				{
-					res[st.top()] = i - st.top();
-					st.pop();
-				}
-				st.emplace(i);
-			}
-		}
-		return res;
+        if(temperatures.empty())
+            return {};
+        int n= temperatures.size();
+        vector<int> res(n);
+        std::stack<int> st;
+        st.push(0);
+
+        for(int i = 1;i < n;i++)
+        {
+            int curr = temperatures[i];
+            if(curr > temperatures[st.top()])
+            {
+                while(!st.empty() && curr > temperatures[st.top()])
+                {
+                    res[st.top()] = i - st.top();
+                    st.pop();                    
+                }
+            }
+            
+            st.push(i);
+
+        }
+        return res;
     }
 };
 ```
@@ -264,37 +267,35 @@ public:
 class Solution {
 public:
     int largestRectangleArea(vector<int>& heights) {
-		heights.insert(heights.begin(),0);
-		heights.emplace_back(0);
-		std::stack<int> st;
-		st.emplace(0);
-		int res = 0;
-		for(int i = 1;i < heights.size();i++)
-		{
-			if(heights[i] > heights[st.top()])
-				st.emplace(i);
-			else if(heights[i] == heights[st.top()])
-			{
-				st.pop();
-				st.emplace(i);
-			}
-			else
-			{
-				while(!st.empty() && heights[st.top()] > heights[i])
-				{
-					int mid = st.top();
-					st.pop();
-					if(!st.empty())
-					{
-						int w = i - st.top()-1;
-						int h = heights[mid];
-						res = std::max(w*h,res);
-					}				
-				}
-				st.emplace(i);
-			}
-		}
-		return res;
+           unsigned long size = heights.size();
+        if (size == 1) {
+            return heights[0];
+        }
+
+
+        heights.insert(heights.begin(),0);
+        heights.push_back(0);
+
+        std::stack<int> st;
+        st.push(0);
+        int res = 0;
+        for(int i = 1;i < heights.size();i++)
+        {
+            while(!st.empty() && heights[i] < heights[st.top()])
+            {
+                int mid = st.top();
+                st.pop();
+                if(st.empty())
+                    break;
+                int h = heights[mid];
+                int right = i-1;
+                int left = st.top()+1;
+                int w = right - left + 1;
+                res = std::max(res,h*w);
+            }
+            st.push(i);
+        }
+        return res;
     }
 };
 ```
@@ -305,36 +306,50 @@ public:
 class Solution {
 public:
     int trap(vector<int>& height) {
-		int n = height.size();
-		int res = 0;
-		std::stack<int> st;
-		st.emplace(0);
-		for(int i = 1;i < n;i++)
-		{
-			if(height[i] < height[st.top()])
-				st.emplace(i);
-			else if(height[i] ==  height[st.top()])
-			{
-				st.pop();
-				st.emplace(i);
-			}
-			else
-			{
-				while(!st.empty() && height[i] > height[st.top()])
-				{
-					int mid = st.top();
-					st.pop();
-					if(!st.empty())
-					{
-						int h = std::min(height[st.top()],height[i])-height[mid];
-						int w = i - st.top() - 1;
-						res += w*h;
-					}
-				}
-				st.emplace(i);  
-			}	
-		}
-		return res;
+        std::stack<int> st;
+        st.push(0);
+        int res = 0;
+        for(int i = 1;i < height.size();i++)
+        {
+            while(!st.empty() && height[i] > height[st.top()])
+            {
+                int mid = st.top();
+                st.pop();
+                if(st.empty())
+                    break;
+                
+                int left = st.top();
+                int w = i - left - 1;
+                int h = std::min(height[i],height[left]) - height[mid];
+                res += w*h;
+            }
+            st.push(i);
+        }
+        return res;
+    }
+};
+```
+
+# [剑指 Offer 31. 栈的压入、弹出序列](https://leetcode-cn.com/problems/zhan-de-ya-ru-dan-chu-xu-lie-lcof/)
+
+```
+class Solution {
+public:
+    bool validateStackSequences(vector<int>& pushed, vector<int>& popped) {
+        if(pushed.size() != popped.size())
+            return false;
+        std::stack<int> st;
+        int j = 0; 
+        for(const auto v : pushed)
+        {
+            st.emplace(v);
+            while(!st.empty() && st.top() == popped[j])
+            {
+                st.pop();
+                j++;
+            }
+        }
+        return st.empty();
     }
 };
 ```

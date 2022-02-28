@@ -149,32 +149,31 @@ public:
 class Solution {
 public:
     int strToInt(string str) {
-		while(!str.empty() && str[0] == ' ')
-			str.erase(0,1);
-		while(!str.empty() && str.back() == ' ')
-			str.pop_back();
-		if(str.empty())
-			return 0;
-		int sign = 1;
-		if(str[0] == '-' || str[0] == '+'){
-			sign = str[0] == '-' ? -1 : 1;
-			str.erase(0,1);
-		}
-			
-		long res = 0;
-		for(const auto c : str)
-		{
-			if(isdigit(c)){
-				res = res * 10 + c - '0';
-				if(res > INT_MAX && sign == 1)
-					return INT_MAX;
-				if(res > INT_MAX && sign == -1)
-					return INT_MIN;
-			}
-			else
-				break;		
-		}
-		return res*sign;	
+        while(!str.empty() && str[0] == ' ')
+            str.erase(0,1);
+        while(!str.empty() && str.back() == ' ')
+            str.pop_back();
+        int sign = 1;
+        if(str[0] == '-' || str[0] == '+')
+        {
+            if(str[0] == '-')                
+                sign = -1;
+            str.erase(0,1);
+        }
+
+        long res = 0;
+        for(auto s : str)
+        {
+            if(!isdigit(s))
+                break;
+            
+            res = res * 10 + s - '0';
+            if(sign == 1 && res > INT_MAX)
+                return INT_MAX;
+            if(sign == -1 && res > INT_MAX)
+                return INT_MIN;
+        }
+        return sign*res;
     }
 };
 ```
