@@ -154,39 +154,36 @@ public:
 class Solution {
 public:
     vector<vector<int>> threeSum(vector<int>& nums) {
-		int n = nums.size();
-        if(n < 3)
-            return {};
-		std::sort(nums.begin(),nums.end());
-		std::vector<std::vector<int>> res;
+		std::sort(nums.begin(),nums.end());	
+		vector<vector<int>> res;
 		
-		for(int i = 0;i < n;i++)
-		{
+		int n = nums.size();
+		for(int i = 0;i < nums.size();i++)
+		{	
 			if(nums[i] > 0)
 				break;
 			if(i > 0 && nums[i] == nums[i-1])
 				continue;
-			int target = -nums[i];
+				
 			int left = i + 1,right = n - 1;
 			while(left < right)
 			{
-				int sum = nums[left] + nums[right];
-				if(sum == target)
-				{
-					res.emplace_back(std::vector<int>{nums[i],nums[left],nums[right]});
-					left++,right--;
+				int total = nums[i] + nums[left] + nums[right];
+				if(total == 0){
+					res.push_back({nums[i],nums[left],nums[right]});
+					left++;
+					right--;
 					while(left < right && nums[left] == nums[left-1])
 						left++;
 					while(left < right && nums[right] == nums[right+1])
-						right--;
-				}			
-				else if(sum > target)
+						right--;						
+				}
+				else if(total > 0)
 					right--;
 				else
-					left++;
+					left++;				
 			}
 		}
-		
 		return res;
     }
 };
@@ -276,20 +273,22 @@ public:
     int findMinArrowShots(vector<vector<int>>& points) {
 		if(points.empty())
 			return 0;
+		
 		std::sort(points.begin(), points.end());
-		int res = 1;
-		int last_pos = points[0][1];
+		std::vector<std::vector<int>> vec;
+		vec.push_back(points[0]);
 		for(int i = 1;i < points.size();i++)
 		{
-			if(points[i][0] <= last_pos)
-				last_pos = std::min(points[i][1],last_pos);
-			else
+			auto curr = points[i];
+			if(curr[0] <= vec.back()[1])
 			{
-				res++;
-				last_pos = points[i][1];
+				vec.back()[0] = std::max(curr[0],vec.back()[0]);
+				vec.back()[1] = std::min(curr[1],vec.back()[1]);
 			}
+			else
+				vec.push_back(points[i]);
 		}
-		return res;
+		return vec.size();
     }
 };
 ```

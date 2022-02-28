@@ -88,12 +88,12 @@ public:
 class Solution {
 public:
     int findNthDigit(int n) {
-		long pos = n;
-		for(int i = 1;;i++)
+		long new_n = n;
+		for(int width = 1;;width++)
 		{
-			if(i * pow(10,i) > pos)
-				return std::to_string(pos/i)[pos%i] - '0';
-			pos += pow(10,i);
+			if(width * pow(10,width) > new_n)
+				return std::to_string(new_n/width)[new_n%width] - '0';
+			new_n += pow(10,width);
 		}
 		return -1;
     }
