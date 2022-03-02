@@ -151,5 +151,27 @@ public:
 };
 ```
 
+# [560. 和为 K 的子数组](https://leetcode-cn.com/problems/subarray-sum-equals-k/)
+
+```
+class Solution {
+public:
+    int subarraySum(vector<int>& nums, int k) {
+        std::unordered_map<int,int> hash;
+        int res = 0,prev = 0;
+        hash[0] = 1;
+        for(const auto n : nums)
+        {
+            prev += n;
+            if(hash.find(prev-k) != hash.end())
+                res+= hash[prev-k];
+            hash[prev]++;
+        }
+        return res;
+    }
+};
+
+```
+
 
 
