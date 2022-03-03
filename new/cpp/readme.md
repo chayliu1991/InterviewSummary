@@ -372,23 +372,547 @@ C++ 正则匹配有三个算法，注意它们都是“只读”的，不会变�
 
 其地址空间由低到高。其中：
 
-- Code Segment(代码段或Text Segment)中存放着程序的机器码和只读数据，可执行指令就是从这里取得的。如果可能，系统会安排相同程序的多个运行实体共享这些实例代码。这个段在内存中一般被标记为只读，任何对该区的写操作都会导致段错误（Segmentation Fault）。
-- Data Segment中存放已初始化的全局或静态变量。
-- BSS中存放未初始化的全局或静态变量。
-- Heap(堆)，堆的大小并不固定，可动态扩张或缩减。其分配由malloc()、new()等这类实时内存分配函数来实现(brk函数也是从这里分配内存)。
-- Stack(栈)，用来存储函数调用时的临时信息，如函数调用所传递的参数、函数的返回地址、函数的局部变量等。 在程序运行时由编译器在需要的时候分配，在不需要的时候自动清除。栈内存的申请和释放遵循LIFO(先进后出)。
+- Code Segment (代码段或Text Segment)中存放着程序的机器码和只读数据，可执行指令就是从这里取得的。如果可能，系统会安排相同程序的多个运行实体共享这些实例代码。这个段在内存中一般被标记为只读，任何对该区的写操作都会导致段错误（Segmentation Fault）
+- Data Segment 中存放已初始化的全局或静态变量
+- BSS 中存放未初始化的全局或静态变量
+- Heap(堆)，堆的大小并不固定，可动态扩张或缩减。其分配由 malloc()、new() 等这类实时内存分配函数来实现(brk函数也是从这里分配内存)
+- Stack(栈)，用来存储函数调用时的临时信息，如函数调用所传递的参数、函数的返回地址、函数的局部变量等。 在程序运行时由编译器在需要的时候分配，在不需要的时候自动清除。栈内存的申请和释放遵循LIFO(先进后出)
 
 堆和栈有哪些不同：
 
 - 分配和管理方式不同
   - 堆是动态分配的，其空间的分配和释放都由程序员控制
-  - 栈由编译器自动管理。栈有两种分配方式：静态分配和动态分配。静态分配由编译器完成，比如局部变量的分配。动态分配由_alloca()函数进行分配，但是栈的动态分配和堆是不同的，它的动态分配是由编译器进行释放，无须手工控制。
+  - 栈由编译器自动管理。栈有两种分配方式：静态分配和动态分配。静态分配由编译器完成，比如局部变量的分配。动态分配由_alloca()函数进行分配，但是栈的动态分配和堆是不同的，它的动态分配是由编译器进行释放，无须手工控制
 - 产生碎片不同
   - 对堆来说，频繁的new/delete或者malloc/free可能会造成内存空间的不连续，造成大量的碎片，使程序效率降低
-  - 对栈而言，则不存在碎片问题，因为栈是先进后出的队列，永远不可能有一个内存块从栈中间弹出。
+  - 对栈而言，则不存在碎片问题，因为栈是先进后出的队列，永远不可能有一个内存块从栈中间弹出
 - 增长方向不同
-  - 堆由低地址向高地址增长。
-  - 栈由高地址向低地址增长。
+  - 堆由低地址向高地址增长
+  - 栈由高地址向低地址增长
+
+## C++ 中的 new
+
+C++ 中的new有三种形态：
+
+### new operator
+
+new operator 即我们经常使用的 `T *ptr = new T()`
+
+new 操作符的执行过程：
+
+- 调用operator new分配内存
+- 调用构造函数生成类对象
+- 返回相应指针
+
+### operator new
+
+- 只分配所要求的空间，不调用相关对象的构造函数。当无法满足所要求分配的空间时，则
+  - 如果有 new_handler，则调用 new_handler
+  - 否则如果没要求不抛出异常（以nothrow参数表达），则执行 bad_alloc 异常，否则返回 0
+- 可以被重载
+  - 重载时，返回类型必须声明为 void*
+  - 重载时，第一个参数类型必须为表达要求分配空间的大小（字节），类型为 size_t
+  - 重载时，可以带其它参数
+
+### placement new
+
+placement new 可以实现在一块指定的内存上(这块内存可以由任意方式分配)构造对象(调用对象的构造函数)
+
+Placement new 使用步骤：
+
+缓存提前分配，有三种方法：
+
+- 在堆上分配：
+
+```
+class Task ;
+char * buff = new [sizeof(Task)]; //@ 分配内存
+```
+
+- 在栈上进行分配：
+
+```
+class Task ;
+char buf[N*sizeof(Task)]; //@ 分配内存
+```
+
+- 直接通过地址(必须是有意义的地址)来使用：
+
+```
+void* buf = reinterpret_cast<void*> (0xF00F);
+```
+
+对象的分配，在刚才已分配的缓存区调用 placement new 来构造一个对象：
+
+```
+Task *ptask = new (buf) Task
+```
+
+对象的析构，一旦你使用完这个对象，你必须调用它的析构函数来毁灭它。按照下面的方式调用析构函数：
+
+```
+ptask->~Task(); //@ 调用析构函数
+```
+
+释放，可以反复利用缓存并给它分配一个新的对象，如果你不打算再次使用这个缓存，你可以象这样释放它：
+
+```
+delete [] buf;
+```
+
+## std::shared_ptr
+
+ shared_ptr 对象在内部指向两个内存位置：
+
+- 指向对象的指针
+- 用于控制引用计数数据的指针
+
+```
+std::shared_ptr<int> ptr2(new int());
+```
+
+此方法在堆上创建了两块内存：
+
+- 存储 int
+- 控制块上用于引用计数的内存，管理附加此内存的 shared_ptr 对象的计数，最初计数将为1
+
+```
+std::shared_ptr<int> ptr = std::make_shared<int>();
+```
+
+一次性为 int 对象和用于引用计数的数据都分配了内存，而 new 操作符只是为 int 分配了内存。加上 O2 优化选项的时候，make_shared会比 new 快上将近 1 倍。
+
+指定删除器：智能指针初始化时可以指定删除器，当引用计数为 0 时会自动调用删除器。std::default_delete 内部通过调用 delete 实现功能
+
+禁止使用一个原始指针初始化多个 std::shared_ptr：
+
+```
+int * ptr = new int;
+std::shared_ptr<int> sp1(ptr);
+std::shared_ptr<int> sp2(ptr); //@ 会导致 double free
+```
+
+禁止在函数实参中创建 std::shared_ptr：
+
+```
+func(std::shared_ptr<int>(new int),g());
+```
+
+因为 C++ 函数的参数计算顺序在不同的编译器有不同的调用约定，一般时从右向左，也可能从左到右。可能的步骤：
+
+- 先调用 new int
+- 再调用 g() 
+- 再创建  std::shared_ptr
+
+如果 g() 函数调用时发生异常，则  std::shared_ptr 还没有创建，new int 的内存就会泄漏。正确的写法：
+
+```
+std::shared_ptr<int> 
+sp(new int)f(sp,g());
+```
+
+通过 shared_from_this() 返回 this 指针：
+
+不要将 this 指针作为 std::shared_ptr 返回，因为 this 本质上是一个裸指针，因此可能导致重复析构，其本质就是使用同一个裸指针初始化多个 std::shared_ptr。
+
+正确返回 this 的 std::shared_ptr  的方法是：让目标类通过派生 `std::enable_shared_from_this<T> ` 类，然后使用基类的成员函数 shared_from_this 来返回 this 的  std::shared_ptr：
+
+```
+struct A : std::enable_shared_from_this<A>
+{
+	std::shared_ptr<A> self()
+	{
+		return shared_from_this();
+	}
+};
+
+int main(void)
+{
+	std::shared_ptr<A> sp1(new A);
+	std::shared_ptr<A> sp2 = sp1->self();
+	return 0;
+}
+```
+
+循环引用：
+
+智能指针的循环引用将导致内存泄漏，解决办法是将 A 和 B 中任何一个成员变量改成 std::weak_ptr。
+
+```
+//@ 引用计数类
+class SharedCount
+{
+private:
+	std::atomic_long count_;
+
+public:
+	SharedCount() noexcept : count_(1)
+	{
+	}
+
+	void add_count() noexcept
+	{
+		count_.fetch_add(1,std::memory_order_relaxed);
+	}
+
+	long reduce_count() noexcept
+	{
+		--count_;
+		return count_;
+	}
+
+	long get_count() const noexcept
+	{
+		return count_;
+	}
+};
+
+//@ 智能指针类
+template <typename T>
+class SharedPtr
+{
+private:
+	T* ptr_;
+	SharedCount* shared_count_;
+
+public:
+	//@ 声明友元，访问其他实体类型的引用变量
+	template <typename U>
+	friend class SharedPtr;
+
+	//@ 构造函数
+	explicit SharedPtr(T* ptr = nullptr) : ptr_(ptr)
+	{
+		if (ptr)
+		{
+			shared_count_ = new SharedCount();
+		}
+	}
+
+	//@ 析构函数
+	~SharedPtr()
+	{
+		if (ptr_ && shared_count_->reduce_count() == 0)
+		{
+			delete ptr_;
+			delete shared_count_;
+		}
+	}
+
+	//@ 拷贝构造函数
+	SharedPtr(const SharedPtr& other) noexcept
+	{
+		ptr_ = other.ptr_;
+		if (ptr_)
+		{
+			//@ 如果指针存在，other的引用计数器+1
+			other.shared_count_->add_count();
+			shared_count_ = other.shared_count_;
+		}
+	}
+
+	template <typename U>
+	SharedPtr(const SharedPtr<U>& other) noexcept
+	{
+		ptr_ = other.ptr_;
+		if (ptr_)
+		{
+			//@ 如果指针存在，other的引用计数器+1
+			other.shared_count_->add_count();
+			shared_count_ = other.shared_count_;
+		}
+	}
+
+	//@ 移动构造函数
+	template <typename U>
+	SharedPtr(SharedPtr<U>&& other) noexcept
+	{
+		ptr_ = other.ptr_;
+		if (ptr_)
+		{
+			shared_count_ = other.shared_count_;
+			other.ptr_ = nullptr;
+		}
+	}
+
+	template <typename U>
+	SharedPtr(const SharedPtr<U>& other, T* ptr) noexcept
+	{
+		ptr_ = ptr;
+		if (ptr_)
+		{
+			other.shared_count_->add_count();
+			shared_count_ = other.shared_count_;
+		}
+	}
+
+	//@ swap函数
+	void swap(SharedPtr& rhs) noexcept
+	{
+		using std::swap;
+		swap(ptr_, rhs.ptr_);
+		swap(shared_count_, rhs.shared_count_);
+	}
+
+	//@ 重载赋值运算符(通过交换实现，形参本来就是传值，不影响原来传入的rhs)
+	SharedPtr& operator = (SharedPtr rhs) noexcept
+	{
+		rhs.swap(*this);
+		return *this;
+	}
+
+	//@ 返回智能指针ptr_成员变量
+	T* get() const noexcept
+	{
+		return ptr_;
+	}
+
+	//@ 返回引用计数
+	long use_count() const noexcept
+	{
+		if (ptr_)
+		{
+			return shared_count_->get_count();
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	//@ * 解引用
+	T& operator*() const noexcept
+	{
+		return *ptr_;
+	}
+	//@ -> 箭头(返回指针)
+	T* operator->() const noexcept
+	{
+		return ptr_;
+	}
+	//@ bool()
+	operator bool() const noexcept
+	{
+		return ptr_;
+	}
+};
+
+//@ swap全局函数
+template <typename T>
+void swap(SharedPtr<T>& lhs, SharedPtr<T>& rhs) noexcept
+{
+	lhs.swap(rhs);
+}
+
+//@ C++强制类型转换
+//@ static_cast
+template <typename T, typename U>
+SharedPtr<T> static_pointer_cast(const SharedPtr<U>& other) noexcept
+{
+	T* ptr = static_cast<T*> (other.get());
+	return SharedPtr<T>(other, ptr);
+}
+//@ reinterpret_cast
+template <typename T, typename U>
+SharedPtr<T> reinterpret_pointer_cast(const SharedPtr<U>& other) noexcept
+{
+	T* ptr = reinterpret_cast<T*> (other.get());
+	return SharedPtr<T>(other, ptr);
+}
+//@ const_cast
+template <typename T, typename U>
+SharedPtr<T> const_pointer_cast(const SharedPtr<U>& other) noexcept
+{
+	T* ptr = const_cast<T*> (other.get());
+	return SharedPtr<T>(other, ptr);
+}
+//@ dynamic_cast
+template <typename T, typename U>
+SharedPtr<T> dynamic_pointer_cast(const SharedPtr<U>& other) noexcept
+{
+	T* ptr = dynamic_cast<T*> (other.get());
+	return SharedPtr<T>(other, ptr);
+}
+
+//@ 工厂函数
+template <typename T, typename...Args>
+SharedPtr<T> make_sharedptr(Args...args)
+{
+	return SharedPtr<T>(new T(std::forward<Args>(args)...));
+}
+
+
+//@ 测试
+struct Base
+{
+	Base(int i) :a(i) {}
+
+	virtual double get_val() = 0;
+
+	double get_a()
+	{
+		return a;
+	}
+
+public:
+	int a;
+};
+
+struct Derived final : Base
+{
+	Derived(int i, double d) : Base(i), b(d)
+	{
+	}
+
+	virtual double get_val() override
+	{
+		return b * a;
+	}
+
+	double get_b()
+	{
+		return b;
+	}
+
+public:
+	double b;
+};
+
+int main()
+{
+	SharedPtr<Base> pb = make_sharedptr<Derived>(10, 3.12);
+	std::cout << pb.use_count() << std::endl;
+	SharedPtr<Base> pb2 = pb;
+	std::cout << pb.use_count() << std::endl;
+
+	std::cout << pb->get_a() << std::endl;
+	std::cout << static_pointer_cast<Derived>(pb)->get_b() << std::endl;
+	std::cout << dynamic_pointer_cast<Derived>(pb)->get_val() << std::endl;
+
+
+	SharedPtr<Base> pb3 = std::move(pb);
+	std::cout << pb.use_count() << std::endl;
+	std::cout << pb2.use_count() << std::endl;
+	std::cout << pb3.use_count() << std::endl;
+
+	return 0;
+}
+```
+
+## std::unique_ptr
+
+std::unique_ptr 是一种独占的智能指针，它禁止其他智能指针与其共享同一个对象，从而保证代码的安全。
+
+既然是独占，换句话说就是不可复制。但是，可以利用 std::move  将其转移给其他的 unique_ptr。
+
+make_unique 并不复杂，C++11 没有提供 std::make_unique，可以自行实现：
+
+```
+//@ 支持普通指针
+template <typename T, typename...Args>
+inline typename std::enable_if<!std::is_array<T>::value, std::unique_ptr<T>>::type
+make_unique(Args&&...args)
+{
+	return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
+//@ 支持动态数组
+template <typename T>
+inline typename std::enable_if<std::is_array<T>::value && std::extent<T>::value == 0, std::unique_ptr<T>>::type
+make_unique(size_t size)
+{
+	typedef typename std::remove_extent<T>::type U;
+	return std::unique_ptr<T>(new U[size]());
+}
+
+//@ 过滤掉定长数组
+template <typename T, typename...Args>
+typename std::enable_if<std::extent<T>::value != 0, void>::type make_unique(Args&&...) = delete;
+
+
+std::unique_ptr<int> p = make_unique<int>(10); //@ OK
+std::unique_ptr<int[]> pArray1 = make_unique<int[]>(10); //@ OK
+std::unique_ptr<int[]> pArray2 = make_unique<int[10]>; //@ 错误，不能创建定长数组的 std::unique_ptr
+```
+
+std::unique_ptr  指定删除器时需要确定删除器的类型：
+
+```
+std::shared_ptr<int> ptr(new int(1), [](int *p) { delete p; }); //@ OK
+std::unique_ptr<int> ptr2(new int(1), [](int *p) { delete p; }); //@ 错误
+
+//@ lambda 没有捕捉变量时是正确的，因为没有捕获变量的 lambda 可以转换成函数指针，如果捕捉了变量则不可以
+std::unique_ptr<int, void(*)(int*)> ptr3(new int(1), [](int *p) { delete p; });
+
+//@ 如果希望 std::unique_ptr 的删除器支持 lambda 则应该写成：
+std::unique_ptr<int, std::function<void(int*)>> ptr4(new int(1), [&](int *p) { delete p; });
+
+//@ 使用仿函数作为删除器
+struct MyDeleter
+{
+    void operator()(int*p)
+    {
+        std::cout << "delete" << std::endl;
+        delete p;
+    }
+};
+std::unique_ptr<int, MyDeleter> ptr5(new int(1));
+```
+
+## std::weak_ptr
+
+- 弱引用指针 std::weak_ptr 用来监视 std::shared_ptr ，不会使引用计数增加，也不管理  std::shared_ptr 内部的指针，主要是监视 std::shared_ptr 的生命周期
+- std::weak_ptr 没有重载 * 和 ->，因为它不共享指针，不能操作资源
+- std::weak_ptr 可以用来解决 std::shared_ptr 的循环引用问题
+- use_count，获取当前观测 std::shared_ptr 的引用计数
+- expired，判断所观测的 std::shared_ptr 是否释放
+- lock，获取监视的 std::shared_ptr，返回 std::shared_ptr，std::shared_ptr 的引用计数加 1
+
+std::enable_from_this 原理：
+
+- std::enable_shared_from_this 内部有一个  std::weak_ptr，这个 std::weak_ptr 用来观测 this 指针的 std::shared_ptr
+- 调用 shared_from_this  实际上内部调用了 std::weak_ptr 的 lock 方法返回一个 std::shared_ptr
+
+# 面向对象
+
+## 基本函数
+
+现代 C++ 中一共有 6 个基本函数：
+
+- 默认构造函数，拷贝构造函数，移动构造函数
+- 赋值函数，移动赋值函数
+- 析构函数
+
+默认行为：
+
+- 如果基类中声明虚析构函数，则默认生成一个虚析构函数，否则生成的函数是非虚函数
+- 拷贝构造函数和拷贝赋值运算符，默认执行的是浅拷贝
+
+深拷贝与浅拷贝
+
+- 浅拷贝：位拷贝，拷贝构造函数，赋值重载。多个对象共用同一块资源，同一块资源释放多次，崩溃或者内存泄漏
+- 深拷贝：每个对象共同拥有自己的资源，必须显式提供拷贝构造函数和赋值运算符。
+
+简而言之：深拷贝和浅拷贝可以简单理解为：如果一个类拥有资源，当这个类的对象发生复制过程的时候，资源重新分配，这个过程就是深拷贝，反之，没有重新分配资源，就是浅拷贝。
+
+## 不要在构造或析构期间调用虚函数
+
+构造或析构函数中调用 virtual 函数不会呈现出多态
+
+- 基类的构造函数先于子类的构造函数。在基类构造函数期间，子类的对象还没有构建，如果子类的虚函数用到了 local 变量，这时如果真的调用了子类的虚函数，会使用为初始化的变量，会有不明确的行为。所以 C++ 不让你走这条路
+- 在基类构造期间，对象类型是基类，不是子类。虚函数会被编译器解析到基类。如果使用了运行期类型信息（例如，dynamic_cast 和 typeid），编译器也会把它视为基类类型
+
+# 对象模型
+
+
+
+
+
+
+
+
+
+
 
 https://zhuanlan.zhihu.com/p/51855842
 

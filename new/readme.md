@@ -194,3 +194,4 @@ typename std::remove_reference<T>::type && move(T&& t)
 C++ 里对异常的定义非常宽松，任何类型都可以用 throw 抛出，也就是说，你可以直接把错误码（int）、或者错误消息`（char*、string）` 抛出，catch 也能接住，然后处理。 
 
 ![](./img/exception.png)
+
