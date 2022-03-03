@@ -240,3 +240,22 @@ public:
 };
 ```
 
+# [338. 比特位计数](https://leetcode-cn.com/problems/counting-bits/)
+
+```
+class Solution {
+public:
+    vector<int> countBits(int n) {
+		vector<int> res(n+1);
+		for(int i = 1;i<=n ;i++)
+		{
+			if(i&0x01)
+				res[i] = res[i-1] + 1;
+			else
+				res[i] = res[i>>1];
+		}
+		return res;
+    }
+};
+```
+
