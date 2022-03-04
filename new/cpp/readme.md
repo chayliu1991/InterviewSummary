@@ -1458,3 +1458,181 @@ template<class Key,class T,class Compare = std::less<Key>>
 class map;
 ```
 
+但很多自定义类型没有默认的比较函数，要作为容器的 key 就有点麻烦。解决这个问题有两种办法：
+
+- 一个是重载 “<”
+- 另一个是自定义模板参数
+
+```
+class Edge final
+{
+public:
+	Edge(int u, int v) : u_(u), v_(v)
+	{
+	}
+
+	bool operator < (const Edge& edge) const noexcept
+	{
+		return this->u_ < edge.u_;
+	}
+
+private:
+	int u_;
+	int v_;
+};
+
+//@ 或者使用全局定义
+bool operator < (const Edge& lhs, const Edge& rhs)
+{
+	return lhs.u_ < rhs.u_;
+}
+
+std::set<Edge> edge_set;
+edge_set.emplace(1, 2);
+edge_set.emplace(3, 4);
+```
+
+另一种方式是编写专门的函数对象或者 lambda 表达式，然后在容器的模板参数里指定。 这种方式更灵活，而且可以实现任意的排序准则：
+
+```
+struct EdgeComp
+{
+	bool operator()(const Edge& lhs, const Edge& rhs)
+	{
+		return lhs.u_ < rhs.v_;
+	}
+};
+
+std::set<Edge, EdgeComp> edge_set;
+edge_set.emplace(1, 2);
+edge_set.emplace(3, 4);
+```
+
+因为有序容器在插入的时候会自动排序，所以就有隐含的插入排序成本，当数据量很大的时候，内部的位置查找、树旋转成本可能会比较高。
+
+如果你需要实时插入排序，那么选择 set/map 是没问题的。如果是非实时，那么最好还是用 vector，全部数据插入完成后再一次性排序，效果肯定会更好。
+
+### 无序容器
+
+无序容器也有四种，分别是 unordered_set/unordered_multiset、unordered_map/unordered_multimap。
+
+无序容器同样也是集合和关联数组，用法上与有序容器几乎是一样的，区别在于内部数据结构：它不是红黑树，而是散列表（也叫哈希表，hash table）。因为它采用散列表存储数据，元素的位置取决于计算的散列值，没有规律可言，所以就 是“无序”的。
+
+无序容器虽然不要求顺序，但是对 key 的要求反而比有序容器更“苛刻”一些：
+
+```
+/*
+ - key 类型
+ - 元素类型
+ - 散列值的函数对象
+ - 相等比较函数
+*/
+template<class Key,class T,class Hash = std::hash<Key>,class KeyEqual = std::equal_to<Key>>
+class unordered_map;
+```
+
+它要求 key 具备两个条件，要把自定义类型作为 key 放入无序容器，必须要具备这两个条件：
+
+- 一是可以计算 hash 值，只有计算 hash 值才能放入散列表
+- 二是能够执行相等比较操作，hash 值可能会冲突，所以当 hash 值相同时，就要比较真正的 key 值
+
+“==”函数比较简单，可以通过重载操作符来实现，或者定义函数对象或者 lambda 表达式。
+
+散列函数就略麻烦一点，可以用函数对象或者 lambda 表达式实现，内部最好调用标准 的 std::hash 函数对象，而不要自己直接计算，否则很容易造成 hash 冲突。
+
+```
+auto edge_hash = [](const Edge& rhs)
+{
+	return std::hash<int>()(rhs.u_);
+};
+
+std::unordered_set<Edge, decltype(edge_hash)> s(10, edge_hash);
+s.emplace(1, 2);
+s.emplace(4, 5);
+```
+
+## 容器适配器
+
+容器适配器特别点在于它们都不是完整的实现，而是依赖于某个现有的容器。
+
+### std::queue
+
+queue  是先进先出（FIFO）的数据结构。queue 缺省用 deque 来实现。它的实际内存布局当然是随底层的容器而定的。
+
+### std::stack
+
+stack 是后进先出（LIFO）的数据结构。  stack 缺省也是用 deque 来实现 。 
+
+### priority_queue
+
+priority_queue  在使用缺省的 less 作为其 Compare 模板参数时，最大的数值会出现在容器的“顶部”。如果需要最小的数值出现在容器顶部，则可以传递 greater 作为其 Compare 模板参数。  
+
+## std::tuple
+
+std::tuple 元组是一个固定大小的不同类型值的集合。可以当作结构体用，又不需要创建结构体，但是对于多段结构体，为了可读性，建议不使用。
+
+基本操作：
+
+- std::make_tuple: 构造元组
+- std::get: 获得元组某个位置的值
+- std::tie: 元组拆包，使用 std::ignore 忽略不想解包的元素
+- std::forward_as_tuple: 创建右值引用元组
+- 合并两个元组可以通过 std::tuple_cat 来实现
+- 获取元组的长度: `std::tuple_size<decltype(t)>::value`
+
+```
+auto get_student(int id)
+{
+	if (id == 0)
+		return std::make_tuple(6.7,'A',"Mike");
+	if (id == 1)
+		return std::make_tuple(9.0, 'B', "Tom");
+	if (id == 2)
+		return std::make_tuple(0.1, 'C', "Jim");
+}
+
+void print_pack(std::tuple<std::string&&, int&&> pack) 
+{
+	std::cout << std::get<0>(pack) << ", " << std::get<1>(pack) << '\n';
+}
+
+int main() {
+	
+	auto student = get_student(2);
+	std::cout << std::get<0>(student) << ","
+		<< std::get<1>(student) << ","
+		<< std::get<2>(student) << "\n";
+
+
+	double gpa;
+	char grade;
+	std::string name;
+
+	std::tie(gpa, grade, std::ignore) = get_student(1);
+	std::cout << gpa << "," << grade << ",";
+		
+	std::string str("John");
+	print_pack(std::forward_as_tuple(str + " Smith", 25));
+		
+	return 0;
+}
+```
+
+## emplace_back
+
+emplace_back 能就地通过函数构造对象，不需要拷贝或者移动内存，相比于 push_back  能更好地避免内存的拷贝与移动，使容器插入元素的性能得到进一步提升。在大多数情况下应该优先使用 emplace_back 来代替 push_back。标准库中类似的方法有：emplace，emplace_hint，emplace_front，emplace_after，emplace_back。
+
+emplace_back  通过构造函数的参数就可以构造对象，因此，要求对象有相应的构造函数，如果没有会编译报错。
+
+## 算法
+
+### 迭代器
+
+C++ 里的迭代器也有很多种，比如输入迭代器、输出迭代器、双向迭代器、随机访问迭代器：
+
+
+
+
+
+
+
