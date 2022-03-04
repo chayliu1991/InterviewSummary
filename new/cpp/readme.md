@@ -999,3 +999,401 @@ RTTI 提供了两个非常有用的操作符：typeid 和 dynamic_cast：
 
 对于带虚函数的类，在运行时执行 RTTI 操作符，返回动态类型信息；对于其他类型，在编译时执行 RTTI，返回静态类型信息。
 
+# 多线程
+
+## 线程基础
+
+- 线程只能移动，并且一个线程不能重复被关联
+- std::this_thread 里，还有 yield()、get_id()、sleep_for()、sleep_until() 、hardware_concurrency() 等几个方便的管理函数
+- 按引用传参需要显示指定，std::ref()
+
+## join 和 detach
+
+启动线程后在线程销毁前要对其调用 join 或 detach，否则 std::thread 的析构函数会调用 std::terminate 终止程序。
+
+### detach
+
+detach 是让目标线程成为守护线程（daemon threads）。
+
+- 一旦 detach，目标线程将独立执行，即便其对应的 thread 对象销毁也不影响线程的执行
+- 一旦 detach，主调线程无法再取得该子线程的控制权。子线程将被 C++ 运行时库接管，当该线程执行结束的时候，由 C++ 运行时库负责回收该线程的资源
+
+### join
+
+- join 之后，当前线程会一直阻塞，直到目标线程执行完成
+- join 之后，当子线程执行结束，主调线程将回收子调线程资源后，主调线程继续运行
+
+### joinable
+
+每个 std::thread 对象都处于可合并（joinable）或不可合并（unjoinable）的状态。joinable 可以用来判断这个线程当前是否可以被 join。
+
+一个可合并的 std::thread 对应于一个底层异步运行的线程，若底层线程处于阻塞、等待调度或已运行结束的状态，则此 std::thread 可合并，否则不可合并。
+
+不可合并的情况：
+
+- 默认构造的 std::thread：此时没有要运行的函数，因此没有对应的底层运行线程
+- 已移动的 std::thread：移动操作导致底层线程被转用于另一个 std::thread  对象
+- 已经 detach 和 join 过的 std::thread
+
+## 仅调用一次
+
+C++ 标准库提供了 std::once_flag 和 std::call_once。
+
+C++11规定 static 变量的初始化只完全发生在一个线程中，直到初始化完成前其他线程都不会做处理，从而避免了 race condition。只有一个全局实例时可以不使用 std::call_once 而直接用 static 变量。
+
+## 线程局部存储
+
+使用 thread_local 说明符声明的变量仅可在它在其上创建的线程上访问。 变量在创建线程时创建，并在销毁线程时销毁。 每个线程都有其自己的变量副本。
+
+## 互斥量
+
+使用 mutex 在访问共享数据前加锁，访问结束后解锁。C++ 11 中提供了如下 4 种语义的互斥量：
+
+- std::mutex：独占的互斥量，不能递归使用
+- std::timed_mutex：带超时的独占的互斥量，不能递归使用
+- std::recursive_mutex：递归互斥量，不带超时功能
+- std::recursive_timed_mutex：带超时的递归互斥量
+
+### std::mutex
+
+- std::mutex 不允许拷贝构造，也不允许移动拷贝，最初产生的 mutex 对象是处于 unlocked 状态的
+- std::mutex::lock 调用线程将锁住该互斥量。线程调用该函数会发生下面 3 种情况：
+  - 如果该互斥量当前没有被锁住，则调用线程将该互斥量锁住，直到调用 unlock 之前，该线程一直拥有该锁
+  - 如果当前互斥量被其他线程锁住，则当前的调用线程被阻塞住
+  - 如果当前互斥量被当前调用线程锁住，则会产生死锁(deadlock)
+- std::mutex::unlock()， 解锁，释放对互斥量的所有权
+- try_lock()，尝试锁住互斥量，如果互斥量被其他线程占有，则当前线程也不会被阻塞。线程调用该函数也会出现下面 3 种情况：
+  - 如果当前互斥量没有被其他线程占有，则该线程锁住互斥量，直到该线程调用 unlock 释放互斥量
+  - 如果当前互斥量被其他线程锁住，则当前调用线程返回 false，而并不会被阻塞掉
+  - 如果当前互斥量被当前调用线程锁住，则会产生死锁(deadlock)
+
+### std::recursive_mutex
+
+和 std::mutex 不同的是，std::recursive_mutex 允许同一个线程对互斥量多次上锁（即递归上锁），来获得对互斥量对象的多层所有权，std::recursive_mutex 释放互斥量时需要调用与该锁层次深度相同次数的 unlock()，可理解为 lock() 次数和 unlock() 次数相同。
+
+### std::time_mutex
+
+std::time_mutex 比 std::mutex 多了两个成员函数，try_lock_for()，try_lock_until()：
+
+- try_lock_for 函数接受一个时间范围，表示在这一段时间范围之内线程如果没有获得锁则被阻塞住（与 std::mutex 的 try_lock() 不同，try_lock 如果被调用时没有获得锁则直接返回 false），如果在此期间其他线程释放了锁，则该线程可以获得对互斥量的锁，如果超时（即在指定时间内还是没有获得锁），则返回 false
+- try_lock_until 函数则接受一个时间点作为参数，在指定时间点未到来之前线程如果没有获得锁则被阻塞住，如果在此期间其他线程释放了锁，则该线程可以获得对互斥量的锁，如果超时（即在指定时间内还是没有获得锁），则返回 false
+
+### std::recursive_timed_mutex
+
+std::recursive_timed_mutex 结合了 std::recursive_mutex 和 std::time_mutex 的功能。
+
+## 锁操作
+
+### std::lock
+
+std::lock 可以一次性锁住多个 mutex，并且没有死锁风险。std::lock 可能抛异常，此时就不会上锁，因此 std::lock 保证要么都锁住，要么都不锁。
+
+### std::lock_guard
+
+ std::lock_guard 是 std::mutex RAII 实现，方便线程对互斥量上锁。
+
+### std::unique_lock
+
+std::unique_lock 更加灵活：
+
+- 可以指定参数 std::defer_lock  表示 mutex 应保持解锁状态，以使 mutex 能被 std::unique_lock::lock 获取
+- 可以把 std::unique_lock 传给 std::lock
+- std::unique_lock 比 std::lock_guard 占用的空间多，会稍慢一点，如果不需要更灵活的锁，依然可以使用 std::lock_guard
+
+## 死锁
+
+死锁的四个必要条件：
+
+- 互斥
+- 占有且等待
+- 不可抢占
+- 循环等待
+
+避免死锁通常建议让两个锁以相同顺序上锁，总是先锁 A 再锁 B，但这并不适用所有情况。
+
+避免死锁的建议：
+
+- 建议1：一个线程已经获取一个锁时就不要获取第二个。如果每个线程只有一个锁，锁上就不会产生死锁（但除了互斥锁，其他方面也可能造成死锁，比如即使无锁，线程间相互等待(互相 join)也可能造成死锁）
+- 建议2：持有锁时避免调用用户提供的代码。用户提供的代码可能做任何事，包括获取锁，如果持有锁时调用用户代码获取锁，就会违反第一个建议，并造成死锁。但有时调用用户代码是无法避免
+- 建议3：按固定顺序获取锁。如果必须获取多个锁且不能用 std::lock 同时获取，最好在每个线程上用固定顺序获取
+- 建议4：如果一个锁被低层持有，就不允许再上锁
+
+## 条件变量
+
+C++ 11 提供两种条件变量：
+
+- condition_variable，配合 `std::unique_lock<std::mutex`> 进行 wait 操作
+- condition_variable_any，和任意带有 lock，unlock 语义的 mutex 搭配使用，比较灵活，但是效率相对较差
+
+条件变量的使用过程如下：
+
+- 拥有条件变量的线程获取互斥量
+- 循环检查某个条件，如果条件不满足，则阻塞直到条件满足；如果条件满足，则向下执行
+- 某个线程满足条件执行完之后，再调用 notify_one 或 notify_all 唤醒一个或者所有等待的线程
+
+### wait
+
+std::condition_variable 提供了两种 wait() 函数：
+
+```
+void wait (unique_lock<mutex>& lck);
+
+template <class Predicate>
+void wait (unique_lock<mutex>& lck, Predicate pred);
+```
+
+- wait() 中加入了 Predicate 用于判断相应的条件是否真正的达成，这是为了避免虚假唤醒导致的错误
+- wait() 传入的参数只能是 std::unique_lock 而不可以是 std::lock_guard：lock_guard 没有 lock 和 unlock 接口，而 unique_lock 提供了相应的接口
+
+当前线程调用 wait() 后将被阻塞(此时当前线程应该获得了锁)，在线程被阻塞时，该函数会自动调用 lck.unlock() 释放锁，使得其他被阻塞在锁竞争上的线程得以继续执行。另外，一旦当前线程获得通知(notified，通常是另外某个线程调用 notify_* 唤醒了当前线程)，wait() 函数也是自动调用 lck.lock()，使得 lck 的状态和 wait 函数被调用时相同。
+
+### wait_for
+
+与 std::condition_variable::wait() 类似，不过 wait_for 可以指定一个时间段，在当前线程收到通知或者指定的时间 rel_time 超时之前，该线程都会处于阻塞状态。而一旦超时或者收到了其他线程的通知，wait_for 返回，剩下的处理步骤和 wait() 类似。
+
+### wait_until
+
+与 std::condition_variable::wait_for 类似，但是 wait_until 可以指定一个时间点，在当前线程收到通知或者指定的时间点 abs_time 超时之前，该线程都会处于阻塞状态。而一旦超时或者收到了其他线程的通知，wait_until 返回，剩下的处理步骤和 wait_for() 类似。
+
+std::cv_status：
+
+- cv_status::no_timeout：wait_for 或者 wait_until 没有超时，即在规定的时间段内线程收到了通知
+- cv_status::timeout：wait_for 或者 wait_until 超时
+
+### notify_one
+
+唤醒某个等待(wait)线程。如果当前没有等待线程，则该函数什么也不做，如果同时存在多个等待线程，则唤醒某个线程是不确定的(unspecified)。
+
+### notify_all
+
+唤醒所有的等待(wait)线程。如果当前没有等待线程，则该函数什么也不做。
+
+### std::condition_variable_any
+
+与 std::condition_variable 类似，只不过 std::condition_variable_any 的 wait 函数可以接受任何 lockable 参数，而 std::condition_variable 只能接受 `std::unique_lock<std::mutex>`  类型的参数，除此以外，和 std::condition_variable 几乎完全一样。
+
+### std::notify_all_at_thread_exit
+
+当调用该函数的线程退出时，所有在 cond 条件变量上等待的线程都会收到通知。
+
+## 异步操作
+
+### std::future 类
+
+std::future 用来访问异步操作的结果，因为一个异步操作的结果不会马上获取，只能在未来的某个地方获取到，这个异步操作的结果是一个未来的值，因此称为 std::future。
+
+std::future 通常由某个 Provider 创建，可以把 Provider 想象成一个异步任务的提供者，Provider 在某个线程中设置共享状态的值，与该共享状态相关联的 std::future 对象调用 get（通常在另外一个线程中） 获取该值。
+
+future::share 允许 move，但是不允许拷贝。
+
+- future::get 会一直阻塞，直到获取到结果或异步任务抛出异常
+- future::wait 一直等待直到数据就绪。数据就绪时，通过 get 函数，无等待即可获得数据
+- future::wait_for 和 future::wait_until 主要是用来进行超时等待的。future::wait_for 等待指定时长，future::wait_until 则等待到指定的时间点。返回值有 3 种状态：
+  - future_status::ready，数据已就绪，可以通过 get 获取了
+  - future_status::timeout，超时，在规定的时间内共享状态的标志没有变成 ready
+  - future_status::deferred，这个和 std::async 相关，表明无需 wait，异步函数将在 get 时执行
+- future::valid 判断当前实例是否有效。future 主要是用来获取异步任务结果的，作为消费方出现，单独构建出来的实例没意义，因此为 false。当与其它生产方(Provider)通过共享状态关联后，才会变得有效，future 才会发挥实际的作用。C++11 中有下面几种 Provider，从这些 Provider 可获得有效的 future 实例：
+  - std::async
+  - promise::get_future
+  - packaged_task::get_future
+- future::share()，返回一个 std::shared_future 对象，调用该函数之后，该 std::future 对象本身已经不和任何共享状态相关联，因此该 std::future 的状态不再是 valid 的了。future 调用 future::get 后就无法再次 future::get，也就是说只能获取一次数据，此外还会导致所在线程与其他线程数据不同步。std::shared_future 就可以解决此问题。
+
+### std::async 函数
+
+std::async() 返回一个 std::future 对象，通过该对象可以获取异步任务的值或异常（如果异步任务抛出了异常）。
+
+std::async 函数可以指定启动策略
+
+- launch::async：函数必须异步执行，即运行在不同的线程上
+- launch::deferred：当其它线程调用 future::get 时，将调用非异步形式
+- launch::async | launch::deferred ：默认启动策略是对两者进行或运算的结果
+
+```
+//@ 函数
+int func(int a)
+{
+	return a * 10;
+}
+
+//@ 成员函数
+struct Class
+{
+	int x{ 0 };
+	int func(int)
+	{
+		x += 1;
+		return x;
+	}
+};
+
+
+//@ 函数对象
+struct Functor {
+	int operator()(int i)
+	{
+		return i * 1000;
+	}
+};
+
+
+int main()
+{
+	auto ft = std::async(func, 42);
+	std::cout << ft.get() << std::endl;
+
+	Class c;
+	auto ft1 = std::async(&Class::func, &c, 42);
+	std::cout << ft1.get() << std::endl;
+	auto ft2 = std::async(&Class::func, c, 42);
+	std::cout << ft2.get() << std::endl;
+
+	Functor fun;
+	auto ft3 = std::async(Functor(), 42);
+	std::cout << ft3.get() << std::endl;
+	auto ft4 = std::async(std::ref(fun), 42);
+	std::cout << ft4.get() << std::endl;
+
+	return 0;
+}
+```
+
+
+
+### std::promise 类
+
+`std::promise<T>` 是一个模板类，在 promise 对象构造时可以和一个共享状态（通常是std::future）相关联，并可以在相关联的共享状态(std::future)上保存一个类型为 T 的值。
+
+- promise::get_future，返回一个与 promise 共享状态相关联的 future ，返回的 future 对象可以访问由 promise 对象设置在共享状态上的值或者某个异常对象，如果不设置值或者异常，promise 对象在析构时会自动地设置一个 future_error 异常
+- promise::set_value，设置共享状态的值，此后 promise 的共享状态标志变为 ready
+- promise::set_exception，为 promise 设置异常，此后 promise 的共享状态变标志变为 ready
+- promise::set_value_at_thread_exit，设置共享状态的值，但是不将共享状态的标志设置为 ready，当线程退出时该 promise 对象会自动设置为 ready
+
+```
+void work(std::promise<int> pro)
+{
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+	pro.set_value(42);
+}
+
+int main()
+{
+	std::promise<int> prom;
+	auto fut = prom.get_future();
+
+	std::thread t(work, std::move(prom));
+
+	while (1)
+	{
+		auto && status = fut.wait_for(std::chrono::milliseconds(300));
+		if (status == std::future_status::timeout)
+			std::cout << "wait timeout ..." << std::endl;
+		else if (status == std::future_status::ready)
+			break;
+	}
+
+	std::cout << "ans is:" << fut.get() << std::endl;
+
+	t.join();
+
+	return 0;
+}
+```
+
+### std::packaged_task 类
+
+`std::packaged_task<T>` 对一个函数或可调用对象绑定一个期望，当 packaged_task 的对象被调用时，它就会调用相关函数或者可调用对象，将期望状态设置为就绪，返回值也会被存储为相关数据。
+
+std::packaged_task 对象内部包含了两个最基本元素：
+
+- 被包装的任务(stored task)，任务(task)是一个可调用的对象，如函数指针、成员函数指针或者函数对象
+- 共享状态(shared state)，用于保存任务的返回值，可以通过 std::future 对象来达到异步访问共享状态的效果
+
+可以通过 std::packged_task::get_future 来获取与共享状态相关联的 std::future 对象。在调用该函数之后，两个对象共享相同的共享状态：
+
+- std::packaged_task 对象是异步 Provider，它在某一时刻通过调用被包装的任务来设置共享状态的值
+- std::future 对象是一个异步返回对象，通过它可以获得共享状态的值，当然在必要的时候需要等待共享状态标志变为 ready
+
+```
+//@ count down taking a second for each value:
+int countdown(int from, int to) 
+{
+	for (int i = from; i != to; --i) 
+	{
+		std::cout << i << '\n';
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+	}
+	std::cout << "Finished!\n";
+	return from - to;
+}
+
+int main()
+{
+	std::packaged_task<int(int, int)> task(countdown); //@ 设置 packaged_task
+	std::future<int> ret = task.get_future(); //@ 获得与 packaged_task 共享状态相关联的 future 对象
+
+	std::thread(std::move(task), 10, 0).detach();   //@ 创建一个新线程完成计数任务
+
+	int value = ret.get();                    //@ 等待任务完成并获取结果
+
+	std::cout << "The countdown lasted for " << value << " seconds.\n";
+
+	return 0;
+}
+```
+
+## 原子操作与内存模型
+
+所谓原子（atomic），在多线程领域里的意思就是不可分的。操作要么完成，要么未完成，不能被任何外部操作打断，总是有一个确定的、完整的状态。所以也就不会存在竞争读写的问题，不需要使用互斥量来同步，成本也就更低。
+
+C++ 11 提供了多种基本原子类型。原子类型不允许由另一个原子类型拷贝赋值，因为拷贝赋值调用了两个对象，破坏了操作的原子性。但可以用对应的内置类型赋值。
+
+### std::atomic_flag
+
+std::atomic_flag 是一个原子的布尔类型，也是唯一保证 lock-free 的原子类型。它只能在  set 和 clear 两个状态之间切换。如果某个 std::atomic_flag 对象使用该宏初始化，那么 ATOMIC_FLAG_INIT 可以保证该 std::atomic_flag 对象在创建时处于 clear 状态。
+
+只支持两种操作：
+
+- test-and-set，检查 std::atomic_flag 标志，如果 std::atomic_flag 之前没有被设置过，则设置 std::atomic_flag 的标志，并返回先前该 std::atomic_flag 对象是否被设置过，如果之前 std::atomic_flag 对象已被设置，则返回 true，否则返回 false
+- clear，清除 std::atomic_flag 对象的标志位，即设置 atomic_flag 的值为 false
+
+用 std::atomic_flag 实现自旋锁：
+
+```
+class  SpinMutex
+{
+public:
+	void lock()
+	{
+		while(flag.test_and_set(std::memory_order_acquire))
+			;
+	}
+
+	void unlock()
+	{
+		flag.clear(std::memory_order_release);
+	}
+
+private:
+	std::atomic_flag flag = ATOMIC_FLAG_INIT;
+};
+```
+
+## 原子操作的内存序
+
+定义内存序的原因：cache 的存在，虽然前面更新了变量的值，但是可能存在某个 CPU 的缓存中，而其他 CPU 的缓存还是原来的值，这样就可能产生错误，定义内存顺序就可以强制性的约束一些值的更新。
+
+```
+typedef enum memory_order {
+    memory_order_relaxed, //@ 无同步或顺序限制，只保证当前操作原子性
+    memory_order_consume, //@ 标记读操作，依赖于该值的读写不能重排到此操作前
+    memory_order_acquire, //@ 标记读操作，之后的读写不能重排到此操作前
+    memory_order_release, //@ 标记写操作，之前的读写不能重排到此操作后
+    memory_order_acq_rel, //@ 仅标记读改写操作，读操作相当于acquire，写操作相当于release
+    memory_order_seq_cst //@ sequential consistency：顺序一致性不允许重排，所有原子操作的默认选项
+} memory_order;
+```
+
+# 容器和算法
+
+
+
