@@ -1630,9 +1630,23 @@ emplace_back  通过构造函数的参数就可以构造对象，因此，要求
 
 C++ 里的迭代器也有很多种，比如输入迭代器、输出迭代器、双向迭代器、随机访问迭代器：
 
+![](./img/iterator_type.png)
 
+### type_traits
 
+- type_traits 是 C++11 提供的模板元基础库
+- type_traits 可实现在编译期计算、判断、转换、查询等等功能。
+- type_traits 提供了编译期的 true 和 false
 
+### 帕排序算法
 
+C++ 准备了多种不同的排序算法：
 
+- 快速排序算法，应该用 sort，通常用它准没错
+- 要求排序后仍然保持元素的相对顺序，应该用 stable_sort，它是稳定的
+- 选出前几名（TopN），应该用 partial_sort
+- 选出前几名，但不要求再排出名次（BestN），应该用 nth_element
+- 中位数（Median）、百分位数（Percentile），应该用 nth_element
+- 按照某种规则把元素划分成两组，应该用 partition
+- 第一名和最后一名，应该用 min_element，max_element，minmax_element
 
