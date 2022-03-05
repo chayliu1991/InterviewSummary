@@ -1509,9 +1509,78 @@ DIGEST 认证的认证步骤：
 - 请求需认证的资源时，服务器会随着状态码 401 Authorization Required， 返回带 WWW-Authenticate 首部字段的响应。该字段内包含质问响应方式认证所需的临时质询码（随机数，nonce）。首部字段 WWW-Authenticate 内必须包含 realm 和 nonce 这两个字段的信息。客户端就是依靠向服务器回送这两个值进行认证的。nonce 是一种每次随返回的 401 响应生成的任意随机字符串。该字符串通常推荐由 Base64 编码的十六进制数的组成形式，但实际内容依赖服务器的具体实现
 - 接收到 401 状态码的客户端，返回的响应中包含 DIGEST 认证必须的首部字段 Authorization 信息。  首部字段 Authorization 内必须包含 username、 realm、nonce、 uri 和 response 的字段信息。其中， realm 和 nonce 就是之前从服务器接收到的响应中的字段。username 是 realm 限定范围内可进行认证的用户名。uri（digest-uri）即 Request-URI 的值，但考虑到经代理转发后 Request-URI 的值可能被修改，因此事先会复制一份副本保存在 uri 内。response 也可叫做 Request-Digest，存放经过 MD5 运算后的密码字符串
 
+## HTTP 的 Session、Cookie 和 Token
+
+### Session、Cookie
+
+Session 和 Cookie 的主要目的就是为了弥补 HTTP 的无状态特性。
+
+Cookie 是由 Web 服务器保存在用户浏览器上的小文件（key-value格式），包含用户相关的信息。客户端向服务器发起请求，如果服务器需要记录该用户状态，就使用 response 向客户端浏览器颁发一个 Cookie。客户端浏览器会把 Cookie 保存起来。当浏览器再请求该网站时，浏览器把请求的网址连同该 Cookie 一同提交给服务器。服务器检查该 Cookie，以此来辨认用户身份。
+
+Session 是依赖 Cookie 实现的。Session 是服务器端对象。Session 是浏览器和服务器会话过程中，服务器分配的一块储存空间。服务器默认为浏览器在 Cookie 中设置 SessionID，浏览器在向服务器请求过程中传输 Cookie 包含 SessionID，服务器根据 SessionID 获取出会话中存储的信息，然后确定会话的身份信息。
+
+详细过程：
+
+![](./img/session_cookie2.png)
+
+- 首先，客户端会发送一个 http 请求到服务器端
+- 服务器端接受客户端请求后，开辟一快 Session 空间，即创建一个 Session 对象，同时生成一个 SessionId，并通过响应头 Set-Cookie:JSESSIONID=XXXXXX  命令，向客户端发送要求设置 Cookie 的响应
+- 客户端收到响应之后，在本机端设置一个 JSESSIONID=XXXXXX 的 Cookie 信息，该 Cookie 的过期时间为浏览器会话结束
+- 接下来客户端每次向同一个网站发送请求时，请求头都会带上 Cookie 信息(包含 SessionId)，然后服务器通过读取请求头中的 Cookie 信息获取名称为 JSESSIONID 的值，得到此次请求的 SessionId
+
+Cookie 与 Session 区别：
+
+- 存储位置与安全性：Cookie 数据存放在客户端上，安全性较差，Session 数据放在服务器上，安全性相对更高
+- 存储空间：单个 Cookie 保存的数据不能超过 4K，很多浏览器都限制一个站点最多保存 20个 Cookie，Session 无此限制
+- 占用服务器资源：Session 一定时间内保存在服务器上，当访问增多，占用服务器性能，考虑到服务器性能方面，应当使用 Cookie
+- 有效期：Session  在超时或者客户端关闭时就会失效，Cookie 可以设置长时间保存
 
 
 
+现在大多都是 Session + Cookie 的使用方式：使用 Session 只需要在客户端保存一个 SessionId，实际上大量数据都是保存在服务端。如果全部用 Cookie，数据量大的时候客户端是没有那么多空间的。如果只用 Cookie 不用 Session，那么账户信息全部保存在客户端，一旦被劫持，全部信息都会泄露。并且客户端数据量变大，网络传输的数据量也会变大。
+
+Cookie 只是实现 Session 的其中一种方案。虽然是最常用的，但并不是唯一的方法，禁用 Cookie 后还有其他方法存储，比如放在 url 中。
+
+### Token
+
+Token 的引入：Token 是在客户端频繁向服务端请求数据，服务端频繁的去数据库查询用户名和密码并进行对比，判断用户名和密码正确与否，并作出相应提示，在这样的背景下，Token 便应运而生。
+
+Token 的定义：Token 是服务端生成的一串字符串，以作客户端进行请求的一个令牌，当第一次登录后，服务器生成一个 Token 便将此 Token 返回给客户端，以后客户端只需带上这个 Token 前来请求数据即可，无需再次带上用户名和密码。
+
+使用 Token 的目的：Token 的目的是为了减轻服务器的压力，减少频繁的查询数据库，使服务器更加健壮。
+
+Token 的认证流程：
+
+- 用户登录，成功后服务器返回 Token 给客户端
+- 客户端收到数据后保存在客户端
+- 客户端再次访问服务器，将 Token  放入headers 中
+- 服务器端采用 filter 过滤器校验。校验成功则返回请求数据，校验失败则返回错误码
+
+Session 与 Token 区别：
+
+- Session 机制存在服务器压力增大，CSRF 跨站伪造请求攻击，扩展性不强等问题
+- Session 存储在服务器端，Token 存储在客户端
+- Token 提供认证和授权功能，作为身份认证，Token 安全性比 session 好
+- Session 这种会话存储方式方式只适用于客户端代码和服务端代码运行在同一台服务器上，Token 适用于项目级的前后端分离（前后端代码运行在不同的服务器下）
+
+## HTTP/1.0
+
+- HTTP/1.0 仅仅提供最基本的认证，这时候用户名和密码还未经过加密，因此容易被窥探
+- HTTP/1.0 被设计用来使用短连接，即每次发送数据都需要经历三次握手和四次挥手，效率比较低
+- HTTP/1.0 只使用 header 的 If-Modified-Since 和 Expires 作为缓存失效的标准
+- HTTP/1.0 不支持断点续传，也就是说每次都会传送全部的页面和数据
+- HTTP/1.0 认为每台计算机只能绑定一个 IP，所以请求消息中的 URL 并没有传递主机名
+
+## HTTP/1.1 
+
+HTTP/1.1 相⽐ HTTP/1.0 的改进：
+
+- HTTP/1.1 使⽤ TCP ⻓连接的⽅式改善了 HTTP/1.0 短连接造成的性能开销
+- HTTP/1.1 ⽀持管道⽹络传输，只要第⼀个请求发出去了，不必等其回来，就可以发第⼆个请求出去，可以减少整体的响应时间
+- HTTP/1.1 使用了摘要算法来进行身份验证
+- HTTP/1.1 新增加了 E-tag，If-Unmodified-Since，If-Match，If-None-Match 等缓存控制标头来控制缓存失效
+- HTTP/1.1  支持断点续传，通过使用请求头中的 Range 实现
+- HTTP/1.1  使用了虚拟网络，在一台物理服务器上可以存在多个虚拟主机，并且他们共享一个 IP 地址
 
 
 
