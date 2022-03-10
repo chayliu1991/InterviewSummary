@@ -169,6 +169,91 @@ AVL树本质上是一颗二叉查找树，AVL树的特性：
 
 红黑树的查询性能略微逊色于AVL树，因为他比avl树会稍微不平衡最多一层，也就是说红黑树的查询性能只比相同内容的avl树最多多一次比较，但是，红黑树在插入和删除上完爆avl树，avl树每次插入删除会进行大量的平衡度计算，而红黑树为了维持红黑性质所做的红黑变换和旋转的开销，相较于avl树为了维持平衡的开销要小得多。
 
+# 死锁
+
+## 产生死锁的四个必要条件
+
+- 互斥条件：一个资源每次只能被一个进程使用
+- 请求与保持条件：一个进程因请求资源而阻塞时，对已获得的资源保持不放
+- 不剥夺条件：进程已获得的资源，在末使用完之前，不能强行剥夺
+-  循环等待条件：若干进程之间形成一种头尾相接的循环等待资源关系
+
+# STL
+
+## STL 迭代器失效
+
+### vector
+
+- 当插入（push_back）一个元素后，end操作返回的迭代器肯定失效
+- 当插入(push_back)一个元素后，capacity返回值与没有插入元素之前相比有改变，则需要重新加载整个容器，此时first和end操作返回的迭代器都会失效
+- 当进行删除操作（erase，pop_back）后，指向删除点的迭代器全部失效；指向删除点后面的元素的迭代器也将全部失效
+
+### deque
+
+- 在deque容器首部或者尾部插入元素不会使得任何迭代器失效
+- 在其首部或尾部删除元素则只会使指向被删除元素的迭代器失效
+- 在deque容器的任何其他位置的插入和删除操作将使指向该容器元素的所有迭代器失效
+
+### list
+
+- 插入操作（insert）和接合操作（splice）不会造成原有的list迭代器失效
+- 删除操作（erase）也只有指向被删除元素的那个迭代器失效，其他迭代器不受影响
+
+### set/multiset
+
+如果迭代器所指向的元素被删除，则该迭代器失效。其它任何增加、删除元素的操作都不会使迭代器失效。
+
+### map/multimap
+
+如果迭代器所指向的元素被删除，则该迭代器失效。其它任何增加、删除元素的操作都不会使迭代器失效。
+
+### 删除操作
+
+vector 的 erase 函数的返回值，是当前被删除元素的下一个元素的迭代器指针：
+
+```
+vector<int>::iterator iter;
+	for (iter = vec.begin(); iter != vec.end(); ) {
+		if (*iter == 1) {
+			iter = vec.erase(iter);
+			// vec.erase(iter++); //这种方式一样可以
+		} else {
+			++iter;
+		}
+	}
+```
+
+map 的删除操作：
+
+```
+std::map<std::string, std::string >::iterator it = mapTest.begin();
+while(it != mapTest.end())
+{
+    if(TestVal(it->second))
+    	mapTest.erase(it++);
+    else
+    	it++;
+  }
+```
+
+- 先把it的值赋值给一个临时变量做为传递给 erase 的参数变量
+- 因为参数处理优先于函数调用，所以接下来执行了 it++ 操作，也就是it现在已经指向了下一个地址
+- 再调用 erase 函数，释放掉第一步中保存的要删除的it的值的临时变量所指的位置
+
+## 容器适配器
+
+- stack 适配器要求能够 push_back，pop_back，back 操作，所以 stack 可以建立在 vector、deque、list 上（array，forward_list不可以）
+- queue 适配器要求容器具有 back，push_back，push_front 操作，因此可以在 list 和 deque 上构造（vector 没有 front 这个操作）
+- priority_queue 要求容器具有push_back，pop_back 以及随机访问（用来排序）的操作。所以可以用 vector 和deque。但是不能建立在 list 上
+
+
+
+
+
+
+
+
+
 
 
 
