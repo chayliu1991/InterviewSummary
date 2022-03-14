@@ -435,6 +435,42 @@ this is father(9668),the a is : (2)
   - vfork 无参数，成功时返回两次，父进程中返回子进程的进程号，子进程中返回 0
   - clone 可以传参，指定一些 flag，和入口函数，成功时返回一次，调用进程中返回的是创建进程的进程号
 
+# gdb
+
+## 多进程调试
+
+![](./img/gdb_multi_process.png)
+
+查看和设置当前的调试模式：
+
+```
+show follow-fork-mode // Debugger response to a program call of fork or vfork is "parent".
+show detach-on-fork  //Whether gdb will detach the child of a fork is on.
+
+set follow-fork-mode parent|child 
+set detach-on-fork   on|off
+```
+
+gdb 将每一个被调试程序的执行状态记录在一个名为 inferior 的结构中。一般情况下一个 inferior 对应一个进程，每个不同的 inferior 有不同的地址空间。inferior 有时候会在进程没有启动的时候就存在。
+
+显示 gdb 调试的所有 inferior，gdb  会为它们分配 ID。其中带有 `*` 的进程是当前正在调试的进程：
+
+```
+info inferiors
+```
+
+切换到编号为 num 的进程进行调试：
+
+```
+inferior num
+```
+
+## 多线程调试
+
+
+
+
+
 
 
 
