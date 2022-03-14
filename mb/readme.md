@@ -257,11 +257,183 @@ while(it != mapTest.end())
 
 ![](./img/subject_observer.png)
 
+# fork，vfork，clone
+
+这三个调用的执行过程是执行fork(),vfork(),clone()时，通过一个系统调用表映射到sys_fork(),sys_vfork(),sys_clone(),再在这三个函数中去调用do_fork()去做具体的创建进程工作。
+
+## fork
+
+fork创建一个进程时，子进程只是完全复制父进程的资源，复制出来的子进程有自己的 task_struct 结构和 pid,但却复制父进程其它所有的资源。例如，要是父进程打开了五个文件，那么子进程也有五个打开的文件，而且这些文件的当前读写指针也停在相同的地方。
+
+这样看来，fork 是一个开销十分大的系统调用，这些开销并不是所有的情况下都是必须的，比如某进程fork出一个子进程后，其子进程仅仅是为了调用 exec 执行另一个可执行文件，那么在 fork 过程中对于虚存空间的复制将是一个多余的过程。但由于现在 Linux 中是采取了 copy-on-write(COW写时复制)技术，为了降低开销，fork 最初并不会真的产生两个不同的拷贝，因为在那个时候，大量的数据其实完全是一样的。写时复制是在推迟真正的数据拷贝。若后来确实发生了写入，那意味着 parent 和 child 的数据不一致了，于是产生复制动作，每个进程拿到属于自己的那一份，这样就可以降低系统调用的开销。所以有了写时复制后呢，vfork其实现意义就不大了。
+
+ fork子进程完全复制父进程的栈空间，也复制了页表，但没有复制物理页面，所以这时虚拟地址相同，物理地址也相同，但是会把父子共享的页面标记为“只读”，直到其中任何一个进程要对共享的页面“写操作”，这时内核会复制一个物理页面给这个进程使用，同时修改页表。而把原来的只读页面标记为“可写”，留给另外一个进程使用。这就是所谓的“写时复制”。
+
+fork() 调用执行一次返回两个值，对于父进程，fork函数返回子程序的进程号，而对于子程序，fork() 函数则返回零，这就是一个函数返回两次的本质。
+
+在 fork 之后，子进程和父进程都会继续执行fork调用之后的指令。子进程是父进程的副本。它将获得父进程的数据空间，堆和栈的副本，这些都是副本，父子进程并不共享这部分的内存。也就是说，子进程对父进程中的同名变量进行修改并不会影响其在父进程中的值。但是父子进程又共享一些东西，简单说来就是程序的代码段。正文段存放着由cpu执行的机器指令，通常是read-only的。
+
+fork不对父子进程的执行次序进行任何限制，fork返回后，子进程和父进程都从调用fork函数的下一条语句开始行，但父子进程运行顺序是不定的，它取决于内核的调度算法。
+
+```
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+int main(void)
+{
+	int count = 1;
+	int child;
+	 
+	child = fork();
+	if(child < 0)
+	{
+		perror("fork error");
+		exit(EXIT_FAILURE);
+	}
+	else if(child == 0)
+	{
+		printf("this is son process(%d),this count is : (%d)，addr is : (%p) \n",(int)getpid(),++count,&count);
+	}
+	else{
+		printf("this is father process(%d),this count is : (%d)，addr is : (%p) \n",(int)getpid(),count,&count);
+	}
+	return EXIT_SUCCESS;
+}
+```
+
+输出：
+
+```
+this is father process(21340),this count is : (1)，addr is : (0x7ffdd73f32c0) 
+this is son process(21341),this count is : (2)，addr is : (0x7ffdd73f32c0) 
+```
+
+子进程改变了count的值，而父进程中的count没有被改变。子进程与父进程count的地址（虚拟地址）是相同的（注意他们在内核中被映射的物理地址不同）
+
+## vfork
+
+vfork是一个过时的应用，vfork也是创建一个子进程，但是子进程共享父进程的空间。在vfork创建子进程之后，父进程阻塞，直到子进程执行了exec()或者exit()。vfork最初是因为fork没有实现COW机制，而很多情况下fork之后会紧接着exec，而exec的执行相当于之前fork复制的空间全部变成了无用功，所以设计了vfork。而现在fork使用了COW机制，唯一的代价仅仅是复制父进程页表的代价，所以vfork不应该出现在新的代码之中。      
+
+vfork 也是在父进程中返回子进程的进程号，在子进程中返回0。
+
+由vfork创建的子进程要先于父进程执行，子进程执行时，父进程处于挂起状态，子进程执行完，唤醒父进程。除非子进程exit或者execve才会唤起父进程。
+
+```
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+int main(void)
+{
+	int count = 1;
+	int child;
+	 
+	child = vfork();
+	if(child < 0)
+	{
+		perror("fork error");
+		exit(EXIT_FAILURE);
+	}
+	else if(child == 0)
+	{
+		printf("this is son process(%d),this count is : (%d)，addr is : (%p) \n",(int)getpid(),++count,&count);
+        exit(EXIT_SUCCESS); //@ 必须写，否则 coredump
+	}
+	else{
+		printf("this is father process(%d),this count is : (%d)，addr is : (%p) \n",(int)getpid(),count,&count);
+		exit(EXIT_FAILURE);
+	}
+	return EXIT_SUCCESS;
+}
+```
+
+输出：
+
+```
+this is son process(13232),this count is : (2)，addr is : (0x7fffa116b340) 
+this is father process(13231),this count is : (2)，addr is : (0x7fffa116b340) 
+```
+
+## clone
+
+clone是Linux为创建线程设计的（虽然也可以用clone创建进程）。所以可以说clone是fork的升级版本，不仅可以创建进程或者线程，还可以指定创建新的命名空间（namespace）、有选择的继承父进程的内存、甚至可以将创建出来的进程变成父进程的兄弟进程等等。
+
+clone可以让你有选择性的继承父进程的资源，你可以选择像vfork一样和父进程共享一个虚存空间，从而使创造的是线程，你也可以不和父进程共享，你甚至可以选择创造出来的进程和父进程不再是父子关系，而是兄弟关系。
+
+系统调用 fork() 和 vfork() 是无参数的，而 clone() 则带有参数。fork()是全部复制，vfork()是共享内存，而clone()是则可以将父进程资源有选择地复制给子进程，而没有复制的数据结构则通过指针的复制让子进程共享，具体要复制哪些资源给子进程，由参数列表中的clone_flags来决定。另外，clone()返回的是子进程的pid。
+
+调用 clone 创建线程：
+
+```
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <malloc.h>
+#include <sched.h>
+
+#define FIBER_STACK 8192
+
+int a ;
+void * stack;
 
 
+int do_sth(void *)
+{
+    printf("this is son(%d),the a is :(%d)\n",getpid(),++a);
+    free(stack);
+    exit(1);
+}
+
+int main(void)
+{
+    void * stack;
+    a = 1;
+    stack = malloc(FIBER_STACK);
+    if(!stack)
+    {
+        printf("malloc for stack failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("create son thread......\n");
+    clone(&do_sth,(char*)stack+FIBER_STACK,CLONE_VM | CLONE_VFORK,0);
+    printf("this is father(%d),the a is : (%d)\n",getpid(),a);
 
 
+	return EXIT_SUCCESS;
+}
+```
 
+输出：
+
+```
+create son thread......
+this is son(9669),the a is :(2)
+this is father(9668),the a is : (2)
+```
+
+## 对比总结
+
+- 执行顺序：
+  - fork 子进程和父进程的执行顺序不确定
+  - vfork 确保子进程执行时，父进程挂起，直到子进程执行 exec 或者 exit 父进程继续执行
+  - clone  由标志CLONE_VFORK来决定子进程在执行时父进程是阻塞还是运行，若没有设置该标志，则父子进程同时运行，设置了该标志，则父进程挂起，直到子进程结束为止
+- 复制内容
+  - fork 子进程完全复制父进程的栈空间，也复制了页表，但没有复制物理页面，所以这时虚拟地址相同，物理地址也相同，直到一个进程要改写共享页面时，才会发生物理页面复制和页面修改，这种机制成为 copy on write
+  - vfork 直接共享父进程的空间
+  - clone 可以有选择性的复制父进程的内存
+- 使用场景
+  - fork 一般用于父子进程能够并行工作的场景
+  - vfork 一般用于创建子进程后，子进程会马上调用 exec 执行新的程序
+  - clone，可以用于创建线程，可以用于创建兄弟进程 
+- 参数和返回值
+  - fork 无参数，成功时返回两次，父进程中返回子进程的进程号，子进程中返回 0
+  - vfork 无参数，成功时返回两次，父进程中返回子进程的进程号，子进程中返回 0
+  - clone 可以传参，指定一些 flag，和入口函数，成功时返回一次，调用进程中返回的是创建进程的进程号
 
 
 
