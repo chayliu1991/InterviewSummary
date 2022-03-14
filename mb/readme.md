@@ -465,7 +465,92 @@ info inferiors
 inferior num
 ```
 
+调试程序：
+
+```
+#include<stdio.h>
+#include<stdlib.h>
+#include<sys/types.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main()
+{
+    pid_t pid;
+    pid = fork();
+    if(pid == 0)
+    {
+        //child
+        printf("child: %d,ppid: %d\n",getpid(),getppid());
+        exit(1);
+    }
+    else
+    {
+        sleep(1);
+        //father
+        printf("father: %d\n",getpid());
+        int status;
+        waitpid(pid,&status,WUNTRACED | WCONTINUED);
+    }
+    return 0;
+}
+
+```
+
 ## 多线程调试
+
+显示当前可调试的所有线程，每个线程会有一个GDB为其分配的ID，后面操作线程的时候会用到这个ID，前面有*的是当前调试的线程：
+
+```
+info threads
+```
+
+切换当前调试的线程为指定ID的线程：
+
+```
+thread ID
+```
+
+默认情况下，所有的线程都会同时执行，而我们有时候需要这样的场景，只需要让一个线程单独执行，而让其他的线程都在等待，这时就可以使用 scheduler-locking：
+
+显示当前 scheduler-locking：
+
+```
+show scheduler-locking
+```
+
+设置 scheduler-locking：
+
+```
+set scheduler-locking off/on/step
+
+set scheduler-locking off：不锁定任何线程，所有线程都可以继续执行，这是默认选项。
+set scheduler-locking on：只有当前线程可以执行，其他线程暂停运行。
+set scheduler-locking step： 当单步执行某一线程时，其它线程不会执行，同时保证在调试过程中当前线程不会发生改变。但如果该模式下执行 continue、until、finish 命令，则其它线程也会执行，并且如果某一线程执行过程遇到断点，则 GDB 调试器会将该线程作为当前线程。
+```
+
+set scheduler-locking要处于线程运行环境下才能生效，也就是程序已经运行并且暂停在某个断点处，否则会出现“Target ‘exec’ cannot support this command.”这样的错误；而且经过测试，设置后的scheduler-locking值在整个进程内有效，不属于某个线程。
+
+显示当前有几个线程：
+
+```
+info threads
+```
+
+切换线程：
+
+```
+thread ID
+```
+
+让所有被调试线程执行GDB命令command：
+
+```
+
+```
+
+
 
 
 
