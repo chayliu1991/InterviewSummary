@@ -547,7 +547,7 @@ thread ID
 让所有被调试线程执行GDB命令command：
 
 ```
-
+thread apply all command
 ```
 
 

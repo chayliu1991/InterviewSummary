@@ -2358,7 +2358,7 @@ int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
 - EPOLLRDHUP：表示套接字的一端已经关闭，或者半关闭
 - EPOLLHUP：表示对应的文件描述字被挂起
 - EPOLLET：设置为 edge-triggered，默认为 level-triggered
-- EPOLLONESHOT：只监听一次事件，当监听完这次事件之后，如果还需要继续监听这个socket的话，需要再次把这个 socket 加入到 EPOLL 队列里
+- EPOLLONESHOT：只监听一次事件                           ，当监听完这次事件之后，如果还需要继续监听这个socket的话，需要再次把这个 socket 加入到 EPOLL 队列里
 
 两种模式：
 
@@ -2376,6 +2376,26 @@ ET(edge-triggered)：
 - 优点：每次内核只会通知一次，大大减少了内核资源的浪费，提高效率
 - 缺点：不能保证数据的完整。不能及时的取出所有的数据
 - 应用场景： 处理大数据。使用 non-block 模式的 socket
+
+### 小结
+
+select ：
+
+- 用户空间和内核空间传递大量存放 fd 的数据，\复制开销大
+- 线性扫描遍历每一个 socket，采用轮询的机制，效率低
+-  单个进程可监视的 fd 数量被限制，一般是 1024 或者 2048
+
+poll：
+
+- 与 select 基本相同，只是 fd 的数量不受限制，原因是它是基于链表来存储的
+
+epoll：
+
+- 没有最大并发连接数量的限制
+- 有活跃的连接产生时，直接回调，而不是采用线性扫描和轮询的机制，效率高
+- fd 消息传递采用 mmap 减少了内核空间和用户空间之间的拷贝
+- 支持 LT，ET 模式，LT 是默认模式，ET 是高效模式
+- epoll 底层的数据结构是红黑树
 
 ## 网络编程相关信号
 
