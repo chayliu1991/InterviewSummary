@@ -110,3 +110,18 @@ int ioctl(int fd, VIDIOC_STREAMON);  /* 打开视频流 */
 close(fd);
 ```
 
+# 数字图像处理
+
+## 常见分割算法
+
+- 大津阈值
+- 区域生长
+- 分水岭
+
+## 常见的边缘检测算法
+
+- 基于梯度的边缘检测
+- Robert 算子
+- Sobel算子
+- Laplace算子
+- Canny算子

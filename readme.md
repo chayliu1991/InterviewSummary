@@ -1,8 +1,7 @@
-写一个vector，用模板，实现添加删除元素，自动扩容，下标访问等功能 https://www.cnblogs.com/-citywall123/p/12846941.html
-STL六大组件
+
 map set的用法，两者区别，数据结构实现原理
 红黑树插入和遍历，以及对应的时间复杂度
-const和#define、strcpy和memcpy
+
 为什么快排效率高
 软中断有哪些
 信号量和互斥量区别
