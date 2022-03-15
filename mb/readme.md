@@ -550,9 +550,49 @@ thread ID
 thread apply all command
 ```
 
+# 可执行文件的生成过程
 
+## 预处理
 
+- 将所有的#define删除，并且展开所有的宏定义
+- 处理所有的条件编译指令，#ifdef #ifndef #endif等，就是带#的那些
+- 处理#include，将#include指向的文件插入到该行处
+- 删除所有注释
+- 添加行号和文件标示，这样的在调试和编译出错的时候才知道是是哪个文件的哪一行
+- 保留#pragma编译器指令，因为编译器需要使用它们
 
+```
+gcc -E hello.c -o hello.i
+```
+
+## 编译
+
+生成汇编代码：
+
+- 词法分析
+- 语法分析
+- 语义分析
+- 优化后生成相应的汇编代码
+
+```
+gcc -S hello.c -o hello.s
+```
+
+## 汇编
+
+汇编代码转换机器码             
+
+```
+gcc -c hello.c -o hello.o
+```
+
+## 链接
+
+将需要的库链接到一起生成可执行程序 
+
+```
+gcc -S hello.c -o a.out
+```
 
 
 
